@@ -10,8 +10,15 @@ export function App() {
             <div className="f1 ma3">
                 Pendulums
             </div>
-            <div className="flex items-center justify-center | bg-light-grey">
-                <DraggablePendulum width={1000} height={750} />
+            <div className="flex flex-column items-center justify-center">
+                <div className="ma1 | bg-light-grey">
+                    <div class="f3 ml2 mt1">Draggable</div>
+                    <DraggablePendulum width={1000} height={750} />
+                </div>
+                <div className="ma1 | bg-light-grey">
+                    <div class="f3 ml2 mt1">Oscillating</div>
+                    <OscillatingPendulum width={1000} height={750} />  
+                </div>
             </div>
         </div>
     );
