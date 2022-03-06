@@ -1,11 +1,13 @@
 const express = require('express');
+const cors = require('cors')
 const { StatusCodes } = require('http-status-codes');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const port = 3001;
-const tickPeriod = 1000;
+const tickPeriod = 1000 / 60;
 
 class Pendulum {
     constructor(x, y, stringLength, angularOffset, mass, radius, wind) {
@@ -25,7 +27,7 @@ class Pendulum {
     }
 
     tick() {
-        const amplitude = 10;
+        const amplitude = 100;
         if (this.x <= this.initialState.x - amplitude || this.x >= this.initialState.x + amplitude) {
             this.speed *= -1;
         }

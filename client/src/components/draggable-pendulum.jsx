@@ -1,12 +1,22 @@
 import React, { useCallback, useState } from "react";
 import { degreesToRadians, getMouseCoords, getMouseDelta } from "utils";
 import { Canvas } from "components/canvas";
+import { usePolling } from "hooks";
+import { SERVER_URL, PENDULUM_ENPOINT, REFRESH_PERIOD } from "constants";
 
 class Pendulum {
     constructor(x, y, radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
+    }
+
+    static fromJson(json) {
+        return new Pendulum(
+            json.x,
+            json.y,
+            json.radius
+        );
     }
 
     getOffset(x, y) {
@@ -26,6 +36,10 @@ class Pendulum {
 export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
     const [pendulum, setPendulum] = useState(new Pendulum(width / 2, height / 2, 20));
     const [isDragging, setIsDragging] = useState(false);
+    usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
+        console.log("tick", json);
+        setPendulum(Pendulum.fromJson(json));
+    });
 
     const draw = useCallback(ctx => {
         ctx.fillStyle = "darkred";
