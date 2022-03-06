@@ -6,7 +6,7 @@ const post = (url, body, callback) => {
     return fetch(url, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: body
+        body: JSON.stringify(body)
     }).then(callback);
 }
 

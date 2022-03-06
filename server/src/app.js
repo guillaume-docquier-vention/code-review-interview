@@ -1,10 +1,10 @@
-const express = require('express');
-const cors = require('cors')
-const { StatusCodes } = require('http-status-codes');
+const express = require("express");
+const cors = require("cors")
+const { StatusCodes } = require("http-status-codes");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000" }));
 
 const port = 3001;
 const tickPeriod = 1000 / 60;
@@ -71,7 +71,7 @@ let simulationState = SimulationStates.NOT_STARTED;
 let pendulum = null;
 let simulationInterval = null;
 
-app.get('/pendulum', (req, res) => {
+app.get("/pendulum", (req, res) => {
     if (pendulum) {
         return res.json(pendulum.toJson());
     }
@@ -79,7 +79,7 @@ app.get('/pendulum', (req, res) => {
     return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
 });
 
-app.post('/pendulum', (req, res) => {
+app.post("/pendulum", (req, res) => {
     pendulum = new Pendulum(
         req.body.x,
         req.body.y,
