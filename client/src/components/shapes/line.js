@@ -17,4 +17,16 @@ export class Line extends Shape {
 
         return expectedY <= y + this.width && expectedY >= y - this.width;
     }
+
+    render(ctx) {
+        ctx.fillStyle = "darkred";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = this.width;
+
+        ctx.beginPath();
+        ctx.moveTo(this.start.x, this.start.y);
+        ctx.lineTo(this.end.x, this.end.y);
+        ctx.stroke();
+        ctx.closePath();
+    }
 }

@@ -8,12 +8,20 @@ export class Pendulum extends Shape {
         this.pivot = pivot;
         this.rod = new Line(pivot, bob, rodWidth);
         this.bob = bob;
-
-        this.parts = [this.pivot, this.bob, this.rod];
     }
 
     contains(x, y) {
-        return this.parts.some(part => part.contains(x, y));
+        return this.rod.contains(x, y) &&
+            this.pivot.contains(x, y) &&
+            this.bob.contains(x, y)
+    }
+
+    render(ctx) {
+        // Render rod first so that it is under the pivot and the bob
+        this.rod.render(ctx);
+
+        this.pivot.render(ctx);
+        this.bob.render(ctx);
     }
 
     // TODO Add 'mousedown', 'drag', etc and let the parts do their behaviour

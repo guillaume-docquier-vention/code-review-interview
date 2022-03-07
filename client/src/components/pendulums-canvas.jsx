@@ -30,6 +30,9 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     ////////////////////
 
     const draw = useCallback(ctx => {
+        pendulum.render(ctx);
+
+        // Start button
         ctx.fillStyle = "darkred";
         ctx.strokeStyle = "black";
 
@@ -37,32 +40,6 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
             x: ctx.canvas.width / 2,
             y: ctx.canvas.height / 2,
         };
-
-        // Rod
-        ctx.beginPath();
-        ctx.lineWidth = pendulum.rod.width;
-        ctx.moveTo(pendulum.rod.start.x, pendulum.rod.start.y);
-        ctx.lineTo(pendulum.rod.end.x, pendulum.rod.end.y);
-        ctx.stroke();
-        ctx.closePath();
-
-        // Pivot
-        ctx.beginPath();
-        ctx.lineWidth = DEFAULT_LINE_WIDTH;
-        ctx.arc(pendulum.pivot.x, pendulum.pivot.y, pendulum.pivot.radius, degreesToRadians(0), degreesToRadians(360));
-        ctx.fill();
-        ctx.stroke();
-        ctx.closePath();
-
-        // Bob
-        ctx.beginPath();
-        ctx.lineWidth = DEFAULT_LINE_WIDTH;
-        ctx.arc(pendulum.bob.x, pendulum.bob.y, pendulum.bob.radius, degreesToRadians(0), degreesToRadians(360));
-        ctx.fill();
-        ctx.stroke();
-        ctx.closePath();
-
-        // Start button
         ctx.beginPath();
         ctx.textAlign = "center";
         ctx.font = "bold 50px sans-serif";
