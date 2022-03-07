@@ -10,7 +10,7 @@ const PENDULUM_RADIUS = 20;
 const ROD_WIDTH = 2;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
-    const [pendulum, setPendulum] = useState(new Pendulum(
+    const [pendulum] = useState(new Pendulum(
         new Circle(width / 2, 0, PIVOT_RADIUS),
         new Circle(width / 2, height / 2, PENDULUM_RADIUS),
         ROD_WIDTH
@@ -21,11 +21,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [isClickingStart, setIsClickingStart] = useState(false);
 
     const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
-        setPendulum(new Pendulum(
-            pendulum.pivot,
-            new Circle(json.x, json.y, pendulum.bob.radius),
-            pendulum.rod.width
-        ));
+        pendulum.bob.x = json.x;
+        pendulum.bob.y = json.y;
     });
 
     const draw = useCallback(ctx => {
@@ -49,13 +46,10 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         const delta = getMouseDelta(e);
 
         if (isDragging) {
-            setPendulum(new Pendulum(
-                pendulum.pivot,
-                new Circle(pendulum.bob.x + delta.x, pendulum.bob.y + delta.y, pendulum.bob.radius),
-                ROD_WIDTH
-            ));
+            pendulum.bob.x += delta.x;
+            pendulum.bob.y += delta.y;
         }
-    }, [pendulum, setPendulum, isDragging]);
+    }, [pendulum, isDragging]);
 
     const onMouseUp = useCallback(e => {
         setIsDragging(false);
