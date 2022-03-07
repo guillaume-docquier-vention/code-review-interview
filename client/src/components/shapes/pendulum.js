@@ -26,25 +26,15 @@ export class Pendulum extends Shape {
 
     // TODO Add 'mousedown', 'drag', etc and let the parts do their behaviour
 
-    // TODO adapt this
-    static fromJson(json) {
-        return new Pendulum(
-            json.x,
-            json.y,
-            json.radius
-        );
-    }
-
-    // TODO adapt this
     toJson() {
         return {
-            x: this.x,
-            y: this.y,
-            stringLength: this.stringLength,
-            angularOffset: this.angularOffset,
-            mass: this.mass,
-            radius: this.radius,
-            wind: this.wind,
+            x: this.bob.x,
+            y: this.bob.y,
+            stringLength: this.rod.length,
+            angularOffset: 90 - this.rod.angle,
+            mass: 10,
+            radius: this.bob.radius,
+            wind: 20,
         };
     }
 }

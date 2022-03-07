@@ -7,6 +7,8 @@ export class Line extends Shape {
         this.start = start;
         this.end = end;
         this.width = width;
+        this.length = Math.sqrt((start.x - end.x)**2 + (start.y - end.y)**2);
+        this.angle = Math.asin((start.y - end.y) / this.length);
     }
 
     contains(x, y) {
