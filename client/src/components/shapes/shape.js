@@ -5,11 +5,38 @@ export class Shape {
         }
     }
 
-    contains(x, y) {
-        throw new Error("Method 'contains(x, y)' must be implemented.");
+    contains(position) {
+        throw new Error("Method 'contains(position)' must be implemented.");
     }
 
     render(ctx) {
         throw new Error("Method 'render(ctx)' must be implemented.");
+    }
+
+    // Maybe these template methods are not so necessary after all
+    mouseDown(position) {
+        if (this.contains(position)) {
+            this.onMouseDown(position);
+        }
+    }
+
+    mouseMove(position, delta) {
+        this.onMouseMove(position, delta);
+    }
+
+    mouseUp(position) {
+        this.onMouseUp(position);
+    }
+
+    onMouseDown(position) {
+        throw new Error("Method 'onMouseDown(position)' must be implemented.");
+    }
+
+    onMouseMove(position) {
+        throw new Error("Method 'onMouseMove(position)' must be implemented.");
+    }
+
+    onMouseUp(position) {
+        throw new Error("Method 'onMouseDown(position)' must be implemented.");
     }
 }

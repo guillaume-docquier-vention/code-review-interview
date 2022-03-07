@@ -9,12 +9,15 @@ export class Circle extends Shape {
         this.x = x;
         this.y = y;
         this.radius = radius;
+
+        this._mousedDown = false;
+        this._isDragging = false;
     }
 
-    contains(x, y) {
+    contains(position) {
         const offset = {
-            x: x - this.x,
-            y: y - this.y
+            x: position.x - this.x,
+            y: position.y - this.y
         };
 
         return Math.sqrt(offset.x**2 + offset.y**2) <= this.radius;
@@ -30,5 +33,26 @@ export class Circle extends Shape {
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
+    }
+
+    onMouseDown(position) {
+        this._mousedDown = true;
+    }
+
+    onMouseMove(position, delta) {
+        if (this._mousedDown) {
+            this._isDragging = true;
+            this.x += delta.x;
+            this.y += delta.y;
+        }
+    }
+
+    onMouseUp(position) {
+        if (this._mousedDown && !this._isDragging) {
+            console.log("I WAS CLICKED");
+        }
+
+        this._mousedDown = false;
+        this._isDragging = false;
     }
 }

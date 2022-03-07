@@ -5,64 +5,53 @@ import { usePolling } from "hooks";
 import { SERVER_URL, PENDULUM_ENPOINT, REFRESH_PERIOD } from "constants";
 import { TextButton, Circle, Pendulum } from "./shapes";
 
-const PIVOT_RADIUS = 4;
+const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
 const ROD_WIDTH = 2;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
+    const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
+        pendulum.bob.x = json.x;
+        pendulum.bob.y = json.y;
+    });
+
     const [pendulum] = useState(new Pendulum(
         new Circle(width / 2, 0, PIVOT_RADIUS),
         new Circle(width / 2, height / 2, PENDULUM_RADIUS),
         ROD_WIDTH
     ));
-    const [startButton] = useState(new TextButton(width / 2, height - 15, "START"));
-
-    const [isDragging, setIsDragging] = useState(false);
-    const [isClickingStart, setIsClickingStart] = useState(false);
-
-    const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
-        pendulum.bob.x = json.x;
-        pendulum.bob.y = json.y;
-    });
+    const [startButton] = useState(new TextButton(width / 2, height - 15, "START", () => {
+        HttpClient.post(SERVER_URL + PENDULUM_ENPOINT, pendulum.toJson(), polling.start);
+    }));
 
     const draw = useCallback(ctx => {
         pendulum.render(ctx);
         startButton.render(ctx);
     }, [pendulum, startButton]);
 
-    ////////////////////
-    //                //
-    // Click controls //
-    //                //
-    ////////////////////
+    const mouseDown = useCallback(e => {
+        const position = getMouseCoords(e);
 
-    const onMouseDown = useCallback(e => {
-        const { x, y } = getMouseCoords(e);
-        setIsDragging(pendulum.bob.contains(x, y));
-        setIsClickingStart(startButton.contains(x, y));
-    }, [setIsDragging, pendulum, setIsClickingStart, startButton]);
+        pendulum.mouseDown(position);
+        startButton.mouseDown(position);
+    }, [pendulum, startButton]);
 
-    const onMouseMove = useCallback(e => {
+    const mouseMove = useCallback(e => {
+        const position = getMouseCoords(e);
         const delta = getMouseDelta(e);
 
-        if (isDragging) {
-            pendulum.bob.x += delta.x;
-            pendulum.bob.y += delta.y;
-        }
-    }, [pendulum, isDragging]);
+        pendulum.mouseMove(position, delta);
+        startButton.mouseMove(position, delta);
+    }, [pendulum, startButton]);
 
-    const onMouseUp = useCallback(e => {
-        setIsDragging(false);
+    const mouseUp = useCallback(e => {
+        const position = getMouseCoords(e);
 
-        const { x, y } = getMouseCoords(e);
-        if (isClickingStart && startButton.contains(x, y)) {
-            HttpClient.post(SERVER_URL + PENDULUM_ENPOINT, pendulum.toJson(), polling.start);
-        }
-
-        setIsClickingStart(false);
-    }, [setIsDragging, isClickingStart, startButton, polling, pendulum, setIsClickingStart]);
+        pendulum.mouseUp(position);
+        startButton.mouseUp(position);
+    }, [startButton, pendulum]);
 
     return (
-        <Canvas draw={draw} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} width={width} height={height} {...canvasProps} />
+        <Canvas draw={draw} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} width={width} height={height} {...canvasProps} />
     );
 };

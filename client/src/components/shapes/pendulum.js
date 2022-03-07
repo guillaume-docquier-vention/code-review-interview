@@ -10,10 +10,10 @@ export class Pendulum extends Shape {
         this.bob = bob;
     }
 
-    contains(x, y) {
-        return this.rod.contains(x, y) &&
-            this.pivot.contains(x, y) &&
-            this.bob.contains(x, y)
+    contains(position) {
+        return this.rod.contains(position) &&
+            this.pivot.contains(position) &&
+            this.bob.contains(position)
     }
 
     render(ctx) {
@@ -22,6 +22,27 @@ export class Pendulum extends Shape {
 
         this.pivot.render(ctx);
         this.bob.render(ctx);
+    }
+
+    mouseDown(position) {
+        this.pivot.mouseDown(position);
+        this.bob.mouseDown(position);
+        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
+        this.rod.mouseDown(position);
+    }
+
+    mouseMove(position, delta) {
+        this.pivot.mouseMove(position, delta);
+        this.bob.mouseMove(position, delta);
+        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
+        this.rod.mouseMove(position, delta);
+    }
+
+    mouseUp(position) {
+        this.pivot.mouseUp(position);
+        this.bob.mouseUp(position);
+        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
+        this.rod.mouseUp(position);
     }
 
     // TODO Add 'mousedown', 'drag', etc and let the parts do their behaviour
