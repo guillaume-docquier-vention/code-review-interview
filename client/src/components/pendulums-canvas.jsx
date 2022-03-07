@@ -1,14 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { degreesToRadians, getMouseCoords, getMouseDelta, HttpClient } from "utils";
+import { getMouseCoords, getMouseDelta, HttpClient } from "utils";
 import { Canvas } from "components/canvas";
 import { usePolling } from "hooks";
 import { SERVER_URL, PENDULUM_ENPOINT, REFRESH_PERIOD } from "constants";
-import { Circle, Pendulum, Rectangle } from "./shapes";
+import { TextButton, Circle, Pendulum } from "./shapes";
 
 const PIVOT_RADIUS = 4;
 const PENDULUM_RADIUS = 20;
 const ROD_WIDTH = 2;
-const DEFAULT_LINE_WIDTH = 2;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [pendulum, setPendulum] = useState(new Pendulum(
@@ -16,9 +15,11 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         new Circle(width / 2, height / 2, PENDULUM_RADIUS),
         ROD_WIDTH
     ));
-    const [startButton, setStartButton] = useState(null);
+    const [startButton] = useState(new TextButton(width / 2, height - 15, "START"));
+
     const [isDragging, setIsDragging] = useState(false);
     const [isClickingStart, setIsClickingStart] = useState(false);
+
     const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
         setPendulum(Pendulum.fromJson(json));
     });
@@ -31,43 +32,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
 
     const draw = useCallback(ctx => {
         pendulum.render(ctx);
-
-        // Start button
-        ctx.fillStyle = "darkred";
-        ctx.strokeStyle = "black";
-
-        const center = {
-            x: ctx.canvas.width / 2,
-            y: ctx.canvas.height / 2,
-        };
-        ctx.beginPath();
-        ctx.textAlign = "center";
-        ctx.font = "bold 50px sans-serif";
-
-        const text = {
-            text: "START",
-            x: center.x,
-            y: ctx.canvas.height - 15
-        }
-        const textMetrics = ctx.measureText(text.text);
-
-        const padding = 10;
-        const startBtn = new Rectangle(
-            text.x - textMetrics.actualBoundingBoxLeft - padding,
-            text.y - textMetrics.actualBoundingBoxAscent - padding,
-            textMetrics.width + 2 * padding,
-            textMetrics.actualBoundingBoxAscent + 2 * padding,
-        );
-        ctx.fillStyle = "blue";
-        ctx.fillRect(startBtn.x, startBtn.y, startBtn.width, startBtn.height);
-        if (!startButton) {
-            setStartButton(startBtn);
-        }
-
-        ctx.fillStyle = "darkred";
-        ctx.fillText(text.text, text.x, text.y);
-        ctx.closePath();
-    }, [pendulum, startButton, setStartButton]);
+        startButton.render(ctx);
+    }, [pendulum, startButton]);
 
     ////////////////////
     //                //

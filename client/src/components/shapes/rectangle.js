@@ -16,4 +16,8 @@ export class Rectangle extends Shape {
             y >= this.y &&
             y <= this.y + this.height;
     }
+
+    render(ctx) {
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
 }
