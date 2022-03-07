@@ -3,70 +3,19 @@ import { degreesToRadians, getMouseCoords, getMouseDelta, HttpClient } from "uti
 import { Canvas } from "components/canvas";
 import { usePolling } from "hooks";
 import { SERVER_URL, PENDULUM_ENPOINT, REFRESH_PERIOD } from "constants";
+import { Circle, Pendulum, Rectangle } from "./shapes";
 
-class Rectangle {
-    constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
+const PIVOT_RADIUS = 4;
+const PENDULUM_RADIUS = 20;
+const ROD_WIDTH = 2;
+const DEFAULT_LINE_WIDTH = 2;
 
-    contains(x, y) {
-        return x >= this.x &&
-            x <= this.x + this.width &&
-            y >= this.y &&
-            y <= this.y + this.height;
-    }
-}
-
-class Pendulum {
-    constructor(x, y, radius) {
-        this.x = x;
-        this.y = y;
-        this.stringLength = 1;
-        this.angularOffset = 2;
-        this.mass = 3;
-        this.radius = radius;
-        this.wind = 4;
-    }
-
-    static fromJson(json) {
-        return new Pendulum(
-            json.x,
-            json.y,
-            json.radius
-        );
-    }
-
-    toJson() {
-        return {
-            x: this.x,
-            y: this.y,
-            stringLength: this.stringLength,
-            angularOffset: this.angularOffset,
-            mass: this.mass,
-            radius: this.radius,
-            wind: this.wind,
-        };
-    }
-
-    getOffset(x, y) {
-        return {
-            x: x - this.x,
-            y: y - this.y
-        }
-    }
-
-    contains(x, y) {
-        const offset = this.getOffset(x, y);
-
-        return Math.sqrt(offset.x**2 + offset.y**2) <= this.radius;
-    }
-}
-
-export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
-    const [pendulum, setPendulum] = useState(new Pendulum(width / 2, height / 2, 20));
+export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
+    const [pendulum, setPendulum] = useState(new Pendulum(
+        new Circle(width / 2, 0, PIVOT_RADIUS),
+        new Circle(width / 2, height / 2, PENDULUM_RADIUS),
+        ROD_WIDTH
+    ));
     const [startButton, setStartButton] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [isClickingStart, setIsClickingStart] = useState(false);
@@ -74,28 +23,46 @@ export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
         setPendulum(Pendulum.fromJson(json));
     });
 
+    ////////////////////
+    //                //
+    //      Draw      //
+    //                //
+    ////////////////////
+
     const draw = useCallback(ctx => {
         ctx.fillStyle = "darkred";
         ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
 
         const center = {
             x: ctx.canvas.width / 2,
             y: ctx.canvas.height / 2,
         };
 
+        // Rod
         ctx.beginPath();
-        ctx.moveTo(center.x, 0);
-        ctx.lineTo(pendulum.x, pendulum.y);
+        ctx.lineWidth = pendulum.rod.width;
+        ctx.moveTo(pendulum.rod.start.x, pendulum.rod.start.y);
+        ctx.lineTo(pendulum.rod.end.x, pendulum.rod.end.y);
         ctx.stroke();
         ctx.closePath();
 
+        // Pivot
         ctx.beginPath();
-        ctx.arc(pendulum.x, pendulum.y, pendulum.radius, degreesToRadians(0), degreesToRadians(360));
+        ctx.lineWidth = DEFAULT_LINE_WIDTH;
+        ctx.arc(pendulum.pivot.x, pendulum.pivot.y, pendulum.pivot.radius, degreesToRadians(0), degreesToRadians(360));
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
 
+        // Bob
+        ctx.beginPath();
+        ctx.lineWidth = DEFAULT_LINE_WIDTH;
+        ctx.arc(pendulum.bob.x, pendulum.bob.y, pendulum.bob.radius, degreesToRadians(0), degreesToRadians(360));
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+
+        // Start button
         ctx.beginPath();
         ctx.textAlign = "center";
         ctx.font = "bold 50px sans-serif";
@@ -125,9 +92,15 @@ export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
         ctx.closePath();
     }, [pendulum, startButton, setStartButton]);
 
+    ////////////////////
+    //                //
+    // Click controls //
+    //                //
+    ////////////////////
+
     const onMouseDown = useCallback(e => {
         const { x, y } = getMouseCoords(e);
-        setIsDragging(pendulum.contains(x, y));
+        setIsDragging(pendulum.bob.contains(x, y));
         setIsClickingStart(startButton.contains(x, y));
     }, [setIsDragging, pendulum, setIsClickingStart, startButton]);
 
@@ -136,9 +109,9 @@ export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
 
         if (isDragging) {
             setPendulum(new Pendulum(
-                pendulum.x + delta.x,
-                pendulum.y + delta.y,
-                pendulum.radius
+                pendulum.pivot,
+                new Circle(pendulum.bob.x + delta.x, pendulum.bob.y + delta.y, pendulum.bob.radius),
+                ROD_WIDTH
             ));
         }
     }, [pendulum, setPendulum, isDragging]);
@@ -148,11 +121,18 @@ export const DraggablePendulum = ({ width, height, ...canvasProps}) => {
 
         const { x, y } = getMouseCoords(e);
         if (isClickingStart && startButton.contains(x, y)) {
-            HttpClient.post(SERVER_URL + PENDULUM_ENPOINT, pendulum.toJson(), polling.start);
+            console.log("START!");
+            // HttpClient.post(SERVER_URL + PENDULUM_ENPOINT, pendulum.toJson(), polling.start);
         }
 
         setIsClickingStart(false);
-    }, [setIsDragging, isClickingStart, startButton, polling, pendulum, setIsClickingStart]);
+    }, [setIsDragging, isClickingStart, startButton, /*polling, pendulum,*/ setIsClickingStart]);
+
+    ////////////////////
+    //                //
+    //     Render     //
+    //                //
+    ////////////////////
 
     return (
         <Canvas draw={draw} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} width={width} height={height} {...canvasProps} />
