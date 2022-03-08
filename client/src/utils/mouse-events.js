@@ -1,6 +1,6 @@
 export const getMouseCoords = e => ({
-    x: e.nativeEvent.layerX,
-    y: e.nativeEvent.layerY
+    x: e.nativeEvent.offsetX,
+    y: e.nativeEvent.offsetY
 });
 
 export const getMouseDelta = e => ({
