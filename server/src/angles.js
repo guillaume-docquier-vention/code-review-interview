@@ -1,12 +1,7 @@
-function degreesToRadians(degrees) {
+export const degreesToRadians = degrees => {
     return degrees * Math.PI / 180;
-}
+};
 
-function radiansToDegrees(radians) {
+export const radiansToDegrees = radians => {
     return radians * 180 / Math.PI;
-}
-
-module.exports = {
-    degreesToRadians,
-    radiansToDegrees
-}
+};

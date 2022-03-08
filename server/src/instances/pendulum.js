@@ -1,8 +1,7 @@
+import { MS_PER_SECONDS } from "../constants";
+import { degreesToRadians } from "../angles";
 
-const { MS_PER_SECONDS } = require("./constants");
-const { degreesToRadians } = require("./angles");
-
-class Pendulum {
+export class Pendulum {
     constructor(pivotPosition, bobPosition, angle, mass, bobRadius, wind, gravity) {
         this.initialState = {
             pivotPosition,
@@ -13,7 +12,7 @@ class Pendulum {
             wind,
             gravity,
             speed: 0,
-        }
+        };
 
         this.reset();
     }
@@ -32,18 +31,17 @@ class Pendulum {
     }
 
     get rodLength() {
-        return Math.sqrt((this.pivotPosition.x - this.bobPosition.x)**2 + (this.pivotPosition.y - this.bobPosition.y)**2);
+        return Math.sqrt((this.pivotPosition.x - this.bobPosition.x) ** 2 + (this.pivotPosition.y - this.bobPosition.y) ** 2);
     }
 
     tick(tickTimeMs) {
-        const angle = this.angle;
-        const rodLength = this.rodLength;
+        const { angle, rodLength } = this;
         const tickTimeSeconds = tickTimeMs / MS_PER_SECONDS;
 
         // Update speed
         const angleToGravity = angle - degreesToRadians(90); // Angle with g force
         const acceleration = this.gravity * Math.sin(angleToGravity);
-        this.speed +=  acceleration * tickTimeSeconds;
+        this.speed += acceleration * tickTimeSeconds;
 
         // Get distance traveled
         const arcLength = this.speed * tickTimeSeconds;
@@ -76,8 +74,4 @@ class Pendulum {
             speed: this.speed,
         };
     }
-}
-
-module.exports = {
-    Pendulum,
 }
