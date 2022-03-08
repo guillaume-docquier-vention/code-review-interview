@@ -11,8 +11,8 @@ const ROD_WIDTH = 4;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
-        pendulum.bob.x = json.x;
-        pendulum.bob.y = json.y;
+        pendulum.bob.x = json.bobPosition.x;
+        pendulum.bob.y = json.bobPosition.y;
     });
 
     const [pendulum] = useState(new Pendulum(

@@ -47,13 +47,11 @@ export class Pendulum extends Shape {
 
     toJson() {
         return {
-            x: this.bob.x,
-            y: this.bob.y,
-            stringLength: this.rod.length,
-            angularOffset: 90 - this.rod.angle, // TODO This is wrong. Angle goes from 0 to 180
-            mass: 10,
-            radius: this.bob.radius,
-            wind: 20,
+            pivotPosition: { x: this.pivot.x, y: this.pivot.y },
+            bobPosition: { x: this.bob.x, y: this.bob.y },
+            angle: this.rod.angle,
+            mass: 1,
+            bobRadius: this.bob.radius,
         };
     }
 }
