@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import { HttpClient } from "utils";
 
-export function usePolling(url, period, callback) {
+export function usePolling(urls, period, callback) {
     const [poll, setPoll] = useState(false);
 
     useEffect(() => {
         const polling = setInterval(() => {
             if (poll) {
-                HttpClient.get(url, callback);
+                for (let i = 0; i < urls.length; i++) {
+                    HttpClient.get(urls[i], json => callback(json, i));
+                }
             }
         }, period);
 
         return () => {
             clearInterval(polling);
         };
-    }, [poll, url, period, callback]);
+    }, [poll, urls, period, callback]);
 
     return {
         start: () => setPoll(true),
