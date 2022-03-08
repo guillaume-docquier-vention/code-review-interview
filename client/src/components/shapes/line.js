@@ -1,3 +1,4 @@
+import { degreesToRadians } from "utils";
 import { Shape } from "./shape";
 
 export class Line extends Shape {
@@ -7,20 +8,60 @@ export class Line extends Shape {
         this.start = start;
         this.end = end;
         this.width = width;
-        this.length = Math.sqrt((start.x - end.x)**2 + (start.y - end.y)**2);
-        this.angle = Math.asin((start.y - end.y) / this.length);
 
         this._mousedDown = false;
         this._isDragging = false;
     }
 
-    contains(position) {
-        // y ± width = ax + b;
-        const a = (this.start.y - this.end.y) / (this.start.x - this.end.x);
-        const b = this.start.y - a * this.start.x;
-        const expectedY = a * position.x + b;
+    get length() {
+        return Math.sqrt((this.start.x - this.end.x)**2 + (this.start.y - this.end.y)**2)
+    }
 
-        return expectedY <= position.y + this.width && expectedY >= position.y - this.width;
+    get angle() {
+        // Angle from horizontal line (0, 0) -> (0, 1)
+        const dx = this.end.x - this.start.x;
+        const dy = this.end.y - this.start.y;
+
+        let radianAngle = Math.atan2(dy, dx);
+        if (radianAngle < 0) {
+            radianAngle += degreesToRadians(360);
+        }
+
+        return radianAngle;
+    }
+
+    contains(position) {
+        // TODO This is hacky
+        if (this.start.contains(position) || this.end.contains(position)) {
+            return false;
+        }
+
+        const lineLength = this.length;
+        const lineAngle = this.angle;
+
+        // Find 4 corners
+        const horizontalWidth = this.width / 2 * Math.sin(lineAngle);
+        const verticalWidth = this.width / 2 * Math.cos(lineAngle);
+        const corners = {
+            topRight: { x: this.start.x + horizontalWidth, y: this.start.y - verticalWidth },
+            bottomRight: { x: this.end.x + horizontalWidth, y: this.end.y - verticalWidth },
+            bottomLeft: { x: this.end.x - horizontalWidth, y: this.end.y + verticalWidth },
+            topLeft: { x: this.start.x - horizontalWidth, y: this.start.y + verticalWidth },
+        };
+
+        // Make 4 triangles
+        const triangles = [
+            [position, corners.topRight, corners.bottomRight],
+            [position, corners.bottomRight, corners.bottomLeft],
+            [position, corners.bottomLeft, corners.topLeft],
+            [position, corners.topLeft, corners.topRight],
+        ];
+
+        // Compare areas
+        const lineArea = lineLength * this.width;
+        const trianglesArea = triangles.map(getTriangleArea).reduce(sum, 0);
+
+        return Math.round(lineArea) === Math.round(trianglesArea);
     }
 
     render(ctx) {
@@ -42,12 +83,14 @@ export class Line extends Shape {
     onMouseMove(position, delta) {
         if (this._mousedDown) {
             this._isDragging = true;
-            // TODO Consider having a drag method to force start and end to drag?
-            this.start.x += delta.x;
-            this.start.y += delta.y;
-            this.end.x += delta.x;
-            this.end.y += delta.y;
+            // TODO This is hacky
+            this.drag({ x: delta.x, y: 0 });
         }
+    }
+
+    drag(delta) {
+        this.start.drag(delta);
+        this.end.drag(delta);
     }
 
     onMouseUp(position) {
@@ -58,4 +101,15 @@ export class Line extends Shape {
         this._mousedDown = false;
         this._isDragging = false;
     }
+}
+
+function getTriangleArea([point1, point2, point3]) {
+    return Math.abs(
+        point1.x * point2.y + point2.x * point3.y + point3.x * point1.y -
+        point1.y * point2.x - point2.y * point3.x - point3.y * point1.x
+    ) / 2;
+}
+
+function sum(acc, value) {
+    return acc + value;
 }

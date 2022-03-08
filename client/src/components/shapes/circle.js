@@ -3,12 +3,14 @@ import { Shape } from "./shape";
 
 const DEFAULT_LINE_WIDTH = 2;
 export class Circle extends Shape {
-    constructor(x, y, radius) {
+    constructor(x, y, radius, options = {}) {
         super();
 
         this.x = x;
         this.y = y;
         this.radius = radius;
+
+        this.dragAxis = options.dragAxis || { x: true, y: true };
 
         this._mousedDown = false;
         this._isDragging = false;
@@ -42,7 +44,16 @@ export class Circle extends Shape {
     onMouseMove(position, delta) {
         if (this._mousedDown) {
             this._isDragging = true;
+            this.drag(delta);
+        }
+    }
+
+    drag(delta) {
+        if (this.dragAxis.x) {
             this.x += delta.x;
+        }
+
+        if (this.dragAxis.y) {
             this.y += delta.y;
         }
     }

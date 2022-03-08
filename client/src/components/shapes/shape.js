@@ -36,6 +36,10 @@ export class Shape {
         throw new Error("Method 'onMouseMove(position)' must be implemented.");
     }
 
+    drag(delta) {
+        return;
+    }
+
     onMouseUp(position) {
         throw new Error("Method 'onMouseDown(position)' must be implemented.");
     }

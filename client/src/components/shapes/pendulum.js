@@ -45,14 +45,12 @@ export class Pendulum extends Shape {
         this.rod.mouseUp(position);
     }
 
-    // TODO Add 'mousedown', 'drag', etc and let the parts do their behaviour
-
     toJson() {
         return {
             x: this.bob.x,
             y: this.bob.y,
             stringLength: this.rod.length,
-            angularOffset: 90 - this.rod.angle,
+            angularOffset: 90 - this.rod.angle, // TODO This is wrong. Angle goes from 0 to 180
             mass: 10,
             radius: this.bob.radius,
             wind: 20,

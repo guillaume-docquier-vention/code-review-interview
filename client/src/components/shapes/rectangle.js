@@ -1,14 +1,16 @@
 import { Shape } from "./shape";
 
 export class Rectangle extends Shape {
-    constructor(x, y, width, height, onClick) {
+    constructor(x, y, width, height, options = {}) {
         super();
 
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.onClick = onClick;
+
+        this.onClick = options.onClick;
+        this.isDraggable = !!options.isDraggable;
 
         this._mousedDown = false;
         this._isDragging = false;
@@ -32,15 +34,22 @@ export class Rectangle extends Shape {
     onMouseMove(position, delta) {
         if (this._mousedDown) {
             this._isDragging = true;
-            this.x += delta.x;
-            this.y += delta.y;
+            if (this.isDraggable) {
+                this.drag(delta);
+            }
         }
+    }
+
+    drag(delta) {
+        this.x += delta.x;
+        this.y += delta.y;
     }
 
     onMouseUp(position) {
         if (this._mousedDown && !this._isDragging) {
-            console.log("I WAS CLICKED");
-            this.onClick();
+            if (this.onClick) {
+                this.onClick();
+            }
         }
 
         this._mousedDown = false;

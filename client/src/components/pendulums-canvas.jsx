@@ -7,7 +7,7 @@ import { TextButton, Circle, Pendulum } from "./shapes";
 
 const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
-const ROD_WIDTH = 2;
+const ROD_WIDTH = 4;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const polling = usePolling(SERVER_URL + PENDULUM_ENPOINT, REFRESH_PERIOD, json => {
@@ -16,7 +16,7 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     });
 
     const [pendulum] = useState(new Pendulum(
-        new Circle(width / 2, 0, PIVOT_RADIUS),
+        new Circle(width / 2, 0, PIVOT_RADIUS, { dragAxis: { x: true } }),
         new Circle(width / 2, height / 2, PENDULUM_RADIUS),
         ROD_WIDTH
     ));

@@ -31,7 +31,9 @@ export class TextButton extends Shape {
                 this.y - textMetrics.actualBoundingBoxAscent - padding,
                 textMetrics.width + 2 * padding,
                 textMetrics.actualBoundingBoxAscent + 2 * padding,
-                this.onClick,
+                {
+                    onClick: this.onClick,
+                },
             );
         }
 
