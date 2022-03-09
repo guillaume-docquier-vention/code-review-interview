@@ -53,8 +53,8 @@ export class Pendulum {
     }
 
     reset() {
-        this.pivotPosition = this.initialState.pivotPosition;
-        this.bobPosition = this.initialState.bobPosition;
+        this.pivotPosition = { ...this.initialState.pivotPosition };
+        this.bobPosition = { ...this.initialState.bobPosition };
         this.mass = this.initialState.mass;
         this.bobRadius = this.initialState.bobRadius;
         this.wind = this.initialState.wind;

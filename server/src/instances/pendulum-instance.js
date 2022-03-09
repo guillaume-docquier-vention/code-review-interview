@@ -11,30 +11,32 @@ export class PendulumInstance extends Instance {
 
         this.tickPeriod = MS_PER_SECONDS / 60;
 
-        this.simulationState = SimulationStates.NOT_STARTED;
+        this.simulationState = SimulationStates.STOPPED;
         this.pendulum = null;
         this.simulationInterval = null;
     }
 
     setupRoutes(app) {
         app.get("/pendulum", (req, res) => {
-            if (this.pendulum) {
-                return res.json(this.pendulum.toJson());
+            if (!this.pendulum) {
+                return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
             }
 
-            return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
+            return res.json(this.pendulum.toJson());
         });
 
-        app.post("/pendulum", (req, res) => {
-            this.pendulum = new Pendulum(
-                req.body.pivotPosition,
-                req.body.bobPosition,
-                req.body.angle,
-                req.body.mass,
-                req.body.bobRadius,
-                NO_WIND,
-                EARTH_GRAVITY,
-            );
+        app.post("/start", (req, res) => {
+            if (this.simulationState === SimulationStates.STOPPED) {
+                this.pendulum = new Pendulum(
+                    req.body.pivotPosition,
+                    req.body.bobPosition,
+                    req.body.angle,
+                    req.body.mass,
+                    req.body.bobRadius,
+                    NO_WIND,
+                    EARTH_GRAVITY,
+                );
+            }
 
             this.simulationState = SimulationStates.STARTED;
             clearInterval(this.simulationInterval);
@@ -42,6 +44,27 @@ export class PendulumInstance extends Instance {
 
             console.log(`[${new Date().toISOString()}] Simulation started on ${this.port}`);
             return res.sendStatus(StatusCodes.CREATED);
+        });
+
+        app.post("/pause", (req, res) => {
+            if (this.simulationState !== SimulationStates.STARTED) {
+                return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
+            }
+
+            this.simulationState = SimulationStates.PAUSED;
+            clearInterval(this.simulationInterval);
+
+            console.log(`[${new Date().toISOString()}] Simulation paused on ${this.port}`);
+            return res.sendStatus(StatusCodes.OK);
+        });
+
+        app.post("/stop", (req, res) => {
+            this.simulationState = SimulationStates.STOPPED;
+            clearInterval(this.simulationInterval);
+            this.pendulum.reset();
+
+            console.log(`[${new Date().toISOString()}] Simulation stopped on ${this.port}`);
+            return res.json(this.pendulum.toJson());
         });
     }
 }

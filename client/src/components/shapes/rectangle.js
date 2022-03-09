@@ -33,8 +33,8 @@ export class Rectangle extends Shape {
 
     onMouseMove(position, delta) {
         if (this._mousedDown) {
-            this._isDragging = true;
             if (this.isDraggable) {
+                this._isDragging = true;
                 this.drag(delta);
             }
         }
@@ -46,7 +46,7 @@ export class Rectangle extends Shape {
     }
 
     onMouseUp(position) {
-        if (this._mousedDown && !this._isDragging) {
+        if (this._mousedDown && !this._isDragging && this.contains(position)) {
             console.log("I WAS CLICKED");
             if (this.onClick) {
                 this.onClick();

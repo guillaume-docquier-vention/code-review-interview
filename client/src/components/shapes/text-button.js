@@ -2,13 +2,17 @@ import { Rectangle } from "./rectangle";
 import { Shape } from "./shape";
 
 export class TextButton extends Shape {
-    constructor(x, y, text, onClick) {
+    constructor(x, y, text, options) {
         super();
 
         this.x = x;
         this.y = y;
         this.text = text;
-        this.onClick = onClick;
+
+        this.onClick = options.onClick;
+        this.backgroundColor = options.backgroundColor || "blue";
+        this.textColor = options.textColor || "darkred";
+        this.disabled = options.disabled;
 
         this.buttonBox = null;
     }
@@ -38,11 +42,19 @@ export class TextButton extends Shape {
         }
 
         ctx.beginPath();
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = this.backgroundColor;
         this.buttonBox.render(ctx);
 
-        ctx.fillStyle = "darkred";
+        ctx.fillStyle = this.textColor;
         ctx.fillText(this.text, this.x, this.y);
+
+        if (this.disabled) {
+            ctx.globalAlpha = 0.7;
+            ctx.fillStyle = "black";
+            this.buttonBox.render(ctx);
+            ctx.globalAlpha = 1;
+        }
+
         ctx.closePath();
     }
 
