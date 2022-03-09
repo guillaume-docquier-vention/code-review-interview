@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { getMouseCoords, getMouseDelta } from "utils";
 import { Canvas } from "components/Canvas";
 import { SERVER_URL, PENDULUM_ENDPOINT, REFRESH_PERIOD } from "constants";
-import { Circle, Pendulum } from "./shapes";
+import { Circle, Line, Pendulum } from "./shapes";
 import { Poller } from "./Poller";
 import { SimulationStates } from "./simulation-states";
 import { StartButton, PauseButton, StopButton } from "./buttons";
@@ -16,10 +16,16 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [state, setState] = useState(SimulationStates.STOPPED);
     const [poll, setPoll] = useState(false);
 
+    const [anchor] = useState(new Line(
+        new Circle(15, 15),
+        new Circle(width - 15, 15),
+        4
+    ));
+
     const [pendulums] = useState([1, 2, 3, 4, 5].map(i =>
         ({
             shape: new Pendulum(
-                new Circle(i * width / 6, 0, PIVOT_RADIUS, { dragAxis: { x: true } }),
+                new Circle(i * width / 6, anchor.start.y, PIVOT_RADIUS, { dragAxis: { x: true } }),
                 new Circle(i * width / 6, height / 2, PENDULUM_RADIUS),
                 ROD_WIDTH
             ),
@@ -48,11 +54,12 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     }, [state, setState, startButton, pauseButton, stopButton])
 
     const draw = useCallback(ctx => {
+        anchor.render(ctx);
         pendulums.forEach(pendulum => pendulum.shape.render(ctx));
         startButton.render(ctx);
         pauseButton.render(ctx);
         stopButton.render(ctx);
-    }, [pendulums, startButton, pauseButton, stopButton]);
+    }, [anchor, pendulums, startButton, pauseButton, stopButton]);
 
     const mouseDown = useCallback(e => {
         const position = getMouseCoords(e);

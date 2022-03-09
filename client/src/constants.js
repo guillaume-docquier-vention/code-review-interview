@@ -1,4 +1,5 @@
 export const SERVER_URL = "http://localhost";
+
 export const PENDULUM_ENDPOINT = "pendulum";
 export const START_ENDPOINT = "start";
 export const PAUSE_ENDPOINT = "pause";
