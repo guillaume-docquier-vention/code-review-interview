@@ -47,6 +47,7 @@ export class Rectangle extends Shape {
 
     onMouseUp(position) {
         if (this._mousedDown && !this._isDragging) {
+            console.log("I WAS CLICKED");
             if (this.onClick) {
                 this.onClick();
             }

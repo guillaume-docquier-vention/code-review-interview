@@ -20,6 +20,6 @@ export class Instance {
     }
 
     setupRoutes(app) {
-        console.log("No routes configured for this instance.");
+        console.log(`No routes configured for this instance (${this.port}).`);
     }
 }

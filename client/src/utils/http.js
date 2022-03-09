@@ -1,13 +1,13 @@
-const get = (url, callback) => {
-    return fetch(url).then(response => response.json().then(callback));
+const get = url => {
+    return fetch(url);
 }
 
-const post = (url, body, callback) => {
+const post = (url, body) => {
     return fetch(url, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
-    }).then(callback);
+    });
 }
 
 export const HttpClient = {

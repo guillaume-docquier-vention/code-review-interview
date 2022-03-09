@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { HttpClient } from "utils";
 
-export function usePolling(urls, period, callback) {
+export function usePolling(url, period, callback) {
     const [poll, setPoll] = useState(false);
 
     useEffect(() => {
-        const polling = setInterval(() => {
+        const polling = setInterval(async () => {
             if (poll) {
-                for (let i = 0; i < urls.length; i++) {
-                    HttpClient.get(urls[i], json => callback(json, i));
+                const response = await HttpClient.get(url);
+                if (response.status === 200) {
+                    const json = await response.json();
+                    callback(json);
                 }
             }
         }, period);
@@ -16,7 +18,7 @@ export function usePolling(urls, period, callback) {
         return () => {
             clearInterval(polling);
         };
-    }, [poll, urls, period, callback]);
+    }, [poll, url, period, callback]);
 
     return {
         start: () => setPoll(true),

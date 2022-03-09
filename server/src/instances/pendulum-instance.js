@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { Pendulum } from "./pendulum";
 import { Instance } from "./instance";
-import { SimulationStates } from "./simulation-states"; 
+import { SimulationStates } from "./simulation-states";
 import { MS_PER_SECONDS, NO_WIND, EARTH_GRAVITY } from "../constants";
 
 export class PendulumInstance extends Instance {
@@ -40,6 +40,7 @@ export class PendulumInstance extends Instance {
             clearInterval(this.simulationInterval);
             this.simulationInterval = setInterval(() => this.pendulum.tick(this.tickPeriod), this.tickPeriod);
 
+            console.log(`[${new Date().toISOString()}] Simulation started on ${this.port}`);
             return res.sendStatus(StatusCodes.CREATED);
         });
     }
