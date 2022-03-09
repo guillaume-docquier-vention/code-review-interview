@@ -2,12 +2,16 @@ import { degreesToRadians } from "utils";
 import { Shape } from "./shape";
 
 export class Line extends Shape {
-    constructor(start, end, width) {
+    constructor(start, end, width, options = {}) {
         super();
 
         this.start = start;
         this.end = end;
         this.width = width;
+
+        this.dragAxis = options.dragAxis || { x: true, y: true };
+        this.fillStyle = options.fillStyle || "darkred";
+        this.strokeStyle = options.strokeStyle || "black";
 
         this._mousedDown = false;
         this._isDragging = false;
@@ -65,8 +69,8 @@ export class Line extends Shape {
     }
 
     render(ctx) {
-        ctx.fillStyle = "darkred";
-        ctx.strokeStyle = "black";
+        ctx.fillStyle = this.fillStyle;
+        ctx.strokeStyle = this.strokeStyle;
         ctx.lineWidth = this.width;
 
         ctx.beginPath();
@@ -83,8 +87,13 @@ export class Line extends Shape {
     onMouseMove(position, delta) {
         if (this._mousedDown) {
             this._isDragging = true;
-            // TODO This is hacky
-            this.drag({ x: delta.x, y: 0 });
+            if (this.dragAxis.x) {
+                this.drag({ x: delta.x, y: 0 });
+            }
+
+            if (this.dragAxis.y) {
+                this.drag({ x: 0, y: delta.y });
+            }
         }
     }
 

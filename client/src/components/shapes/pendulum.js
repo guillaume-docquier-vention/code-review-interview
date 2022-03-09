@@ -6,13 +6,18 @@ export class Pendulum extends Shape {
         super();
 
         this.pivot = pivot;
-        this.rod = new Line(pivot, bob, rodWidth);
+        this.rod = new Line(pivot, bob, rodWidth, { dragAxis: { x: true } });
         this.bob = bob;
+
+        this.wind = {
+            speed: 1,
+            angle: 0
+        }
     }
 
     contains(position) {
-        return this.rod.contains(position) &&
-            this.pivot.contains(position) &&
+        return this.rod.contains(position) ||
+            this.pivot.contains(position) ||
             this.bob.contains(position)
     }
 
@@ -27,21 +32,18 @@ export class Pendulum extends Shape {
     mouseDown(position) {
         this.pivot.mouseDown(position);
         this.bob.mouseDown(position);
-        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
         this.rod.mouseDown(position);
     }
 
     mouseMove(position, delta) {
         this.pivot.mouseMove(position, delta);
         this.bob.mouseMove(position, delta);
-        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
         this.rod.mouseMove(position, delta);
     }
 
     mouseUp(position) {
         this.pivot.mouseUp(position);
         this.bob.mouseUp(position);
-        // Might interfere with other components because of visual layering (part of the rod is under other shapes)
         this.rod.mouseUp(position);
     }
 
@@ -52,6 +54,7 @@ export class Pendulum extends Shape {
             angle: this.rod.angle,
             mass: 1,
             bobRadius: this.bob.radius,
+            wind: this.wind,
         };
     }
 }

@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { Pendulum } from "./pendulum";
 import { Instance } from "./instance";
 import { SimulationStates } from "./simulation-states";
-import { MS_PER_SECONDS, NO_WIND, EARTH_GRAVITY } from "../constants";
+import { MS_PER_SECONDS, EARTH_GRAVITY } from "../constants";
 
 export class PendulumInstance extends Instance {
     constructor(port, clientUrl) {
@@ -33,7 +33,7 @@ export class PendulumInstance extends Instance {
                     req.body.angle,
                     req.body.mass,
                     req.body.bobRadius,
-                    NO_WIND,
+                    req.body.wind,
                     EARTH_GRAVITY,
                 );
             }

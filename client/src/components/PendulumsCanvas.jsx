@@ -5,7 +5,7 @@ import { SERVER_URL, PENDULUM_ENDPOINT, REFRESH_PERIOD } from "constants";
 import { Circle, Line, Pendulum } from "./shapes";
 import { Poller } from "./Poller";
 import { SimulationStates } from "./simulation-states";
-import { StartButton, PauseButton, StopButton } from "./buttons";
+import { StartButton, PauseButton, StopButton, WindCompass } from "./controls";
 
 const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
@@ -33,9 +33,10 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         })
     ));
 
-    const [startButton] = useState(StartButton(1 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
-    const [pauseButton] = useState(PauseButton(2 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
-    const [stopButton] = useState(StopButton(3 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [startButton] = useState(StartButton(1 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [pauseButton] = useState(PauseButton(2 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [stopButton] = useState(StopButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [windCompass] = useState(WindCompass(width - 75, height - 75, pendulums));
 
     useEffect(() => {
         if (state === SimulationStates.STARTED) {
@@ -59,7 +60,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         startButton.render(ctx);
         pauseButton.render(ctx);
         stopButton.render(ctx);
-    }, [anchor, pendulums, startButton, pauseButton, stopButton]);
+        windCompass.render(ctx);
+    }, [anchor, pendulums, startButton, pauseButton, stopButton, windCompass]);
 
     const mouseDown = useCallback(e => {
         const position = getMouseCoords(e);
@@ -68,7 +70,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         startButton.mouseDown(position);
         pauseButton.mouseDown(position);
         stopButton.mouseDown(position);
-    }, [pendulums, startButton, pauseButton, stopButton]);
+        windCompass.mouseDown(position);
+    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
 
     const mouseMove = useCallback(e => {
         const position = getMouseCoords(e);
@@ -78,7 +81,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         startButton.mouseMove(position, delta);
         pauseButton.mouseMove(position, delta);
         stopButton.mouseMove(position, delta);
-    }, [pendulums, startButton, pauseButton, stopButton]);
+        windCompass.mouseMove(position, delta);
+    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
 
     const mouseUp = useCallback(e => {
         const position = getMouseCoords(e);
@@ -87,7 +91,8 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         startButton.mouseUp(position);
         pauseButton.mouseUp(position);
         stopButton.mouseUp(position);
-    }, [pendulums, startButton, pauseButton, stopButton]);
+        windCompass.mouseUp(position);
+    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
 
     return (
         <>

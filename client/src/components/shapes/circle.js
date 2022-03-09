@@ -11,6 +11,9 @@ export class Circle extends Shape {
         this.radius = radius;
 
         this.dragAxis = options.dragAxis || { x: true, y: true };
+        this.fillStyle = options.fillStyle || "darkred";
+        this.strokeStyle = options.strokeStyle || "black";
+        this.lineWidth = options.lineWidth || DEFAULT_LINE_WIDTH;
 
         this._mousedDown = false;
         this._isDragging = false;
@@ -26,9 +29,9 @@ export class Circle extends Shape {
     }
 
     render(ctx) {
-        ctx.fillStyle = "darkred";
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = DEFAULT_LINE_WIDTH;
+        ctx.fillStyle = this.fillStyle;
+        ctx.strokeStyle = this.strokeStyle;
+        ctx.lineWidth = this.lineWidth;
 
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, degreesToRadians(0), degreesToRadians(360));

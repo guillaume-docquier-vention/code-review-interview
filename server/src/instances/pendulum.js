@@ -57,7 +57,7 @@ export class Pendulum {
         this.bobPosition = { ...this.initialState.bobPosition };
         this.mass = this.initialState.mass;
         this.bobRadius = this.initialState.bobRadius;
-        this.wind = this.initialState.wind;
+        this.wind = { ...this.initialState.wind };
         this.gravity = this.initialState.gravity;
         this.speed = this.initialState.speed;
     }
