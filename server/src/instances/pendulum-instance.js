@@ -58,12 +58,12 @@ export class PendulumInstance extends Instance {
             return res.sendStatus(StatusCodes.OK);
         });
 
-        app.post("/stop", (req, res) => {
+        app.post("/reset", (req, res) => {
             this.simulationState = SimulationStates.STOPPED;
             clearInterval(this.simulationInterval);
             this.pendulum.reset();
 
-            console.log(`[${new Date().toISOString()}] Simulation stopped on ${this.port}`);
+            console.log(`[${new Date().toISOString()}] Simulation reset on ${this.port}`);
             return res.json(this.pendulum.toJson());
         });
     }

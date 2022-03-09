@@ -1,5 +1,7 @@
 import { Shape } from "./shape";
 import { Line } from "./line";
+import { WIND_SPEED } from "constants";
+import { BOB_MASS } from "constants";
 
 export class Pendulum extends Shape {
     constructor(pivot, bob, rodWidth) {
@@ -10,7 +12,7 @@ export class Pendulum extends Shape {
         this.bob = bob;
 
         this.wind = {
-            speed: 1,
+            speed: WIND_SPEED,
             angle: 0
         }
     }
@@ -47,12 +49,13 @@ export class Pendulum extends Shape {
         this.rod.mouseUp(position);
     }
 
+    // TODO We're mixing model and shape
     toJson() {
         return {
             pivotPosition: { x: this.pivot.x, y: this.pivot.y },
             bobPosition: { x: this.bob.x, y: this.bob.y },
             angle: this.rod.angle,
-            mass: 1,
+            mass: BOB_MASS,
             bobRadius: this.bob.radius,
             wind: this.wind,
         };

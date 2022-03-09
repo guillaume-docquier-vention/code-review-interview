@@ -13,7 +13,8 @@ export const WindCompass = (x, y, pendulums) => {
                 pendulums.forEach(pendulum => {
                     pendulum.shape.wind.angle = angle;
                 });
-            }
+            },
+            backgroundColor: "CornflowerBlue"
         }
     );
 }

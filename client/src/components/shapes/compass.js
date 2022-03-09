@@ -16,7 +16,7 @@ export class Compass extends Shape {
             new Circle(center.x + radius * 0.85, center.y),
             8
         );
-        this.ring = new Circle(center.x, center.y, radius);
+        this.ring = new Circle(center.x, center.y, radius, { fillStyle: options.backgroundColor });
     }
 
     contains(position) {

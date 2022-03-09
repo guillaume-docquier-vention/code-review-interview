@@ -5,7 +5,7 @@ import { SERVER_URL, PENDULUM_ENDPOINT, REFRESH_PERIOD } from "constants";
 import { Circle, Line, Pendulum } from "./shapes";
 import { Poller } from "./Poller";
 import { SimulationStates } from "./simulation-states";
-import { StartButton, PauseButton, StopButton, WindCompass } from "./controls";
+import { StartButton, PauseButton, ResetButton, WindCompass } from "./controls";
 
 const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
@@ -26,7 +26,7 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         ({
             shape: new Pendulum(
                 new Circle(i * width / 6, anchor.start.y, PIVOT_RADIUS, { dragAxis: { x: true } }),
-                new Circle(i * width / 6, height / 2, PENDULUM_RADIUS),
+                new Circle(i * width / 6, height / 2, PENDULUM_RADIUS + 10 * (i - 1)),
                 ROD_WIDTH
             ),
             server: `${SERVER_URL}:300${i}`,
@@ -35,43 +35,45 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
 
     const [startButton] = useState(StartButton(1 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
     const [pauseButton] = useState(PauseButton(2 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
-    const [stopButton] = useState(StopButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [resetButton] = useState(ResetButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
     const [windCompass] = useState(WindCompass(width - 75, height - 75, pendulums));
 
+    // TODO Have the server tell the state
     useEffect(() => {
         if (state === SimulationStates.STARTED) {
             startButton.disabled = true;
             pauseButton.disabled = false;
-            stopButton.disabled = false;
+            resetButton.disabled = false;
         } else if (state === SimulationStates.PAUSED) {
             startButton.disabled = false;
             pauseButton.disabled = true;
-            stopButton.disabled = false;
+            resetButton.disabled = false;
         } else if (state === SimulationStates.STOPPED) {
             startButton.disabled = false;
             pauseButton.disabled = true;
-            stopButton.disabled = true;
+            resetButton.disabled = true;
         }
-    }, [state, setState, startButton, pauseButton, stopButton])
+    }, [state, setState, startButton, pauseButton, resetButton])
 
     const draw = useCallback(ctx => {
         anchor.render(ctx);
         pendulums.forEach(pendulum => pendulum.shape.render(ctx));
         startButton.render(ctx);
         pauseButton.render(ctx);
-        stopButton.render(ctx);
+        resetButton.render(ctx);
         windCompass.render(ctx);
-    }, [anchor, pendulums, startButton, pauseButton, stopButton, windCompass]);
+    }, [anchor, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
+    // TODO Disable most drags and clicks while simulation is running
     const mouseDown = useCallback(e => {
         const position = getMouseCoords(e);
 
         pendulums.forEach(pendulum => pendulum.shape.mouseDown(position));
         startButton.mouseDown(position);
         pauseButton.mouseDown(position);
-        stopButton.mouseDown(position);
+        resetButton.mouseDown(position);
         windCompass.mouseDown(position);
-    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
+    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     const mouseMove = useCallback(e => {
         const position = getMouseCoords(e);
@@ -80,9 +82,9 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         pendulums.forEach(pendulum => pendulum.shape.mouseMove(position, delta));
         startButton.mouseMove(position, delta);
         pauseButton.mouseMove(position, delta);
-        stopButton.mouseMove(position, delta);
+        resetButton.mouseMove(position, delta);
         windCompass.mouseMove(position, delta);
-    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
+    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     const mouseUp = useCallback(e => {
         const position = getMouseCoords(e);
@@ -90,9 +92,9 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         pendulums.forEach(pendulum => pendulum.shape.mouseUp(position));
         startButton.mouseUp(position);
         pauseButton.mouseUp(position);
-        stopButton.mouseUp(position);
+        resetButton.mouseUp(position);
         windCompass.mouseUp(position);
-    }, [pendulums, startButton, pauseButton, stopButton, windCompass]);
+    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     return (
         <>

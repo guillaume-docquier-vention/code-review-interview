@@ -1,5 +1,5 @@
 import { MS_PER_SECONDS } from "../constants";
-import { degreesToRadians } from "../angles";
+import { computeAngle, degreesToRadians } from "../angles";
 
 export class Pendulum {
     constructor(pivotPosition, bobPosition, angle, mass, bobRadius, wind, gravity) {
@@ -38,9 +38,27 @@ export class Pendulum {
         const { angle, rodLength } = this;
         const tickTimeSeconds = tickTimeMs / MS_PER_SECONDS;
 
+        // Resolve forces
+        const gForce = {
+            x: 0,
+            y: this.gravity * this.mass,
+        };
+        const windForce = {
+            x: this.wind.speed * this.bobRadius * Math.cos(this.wind.angle) * -1, // Wind applies a force against you
+            y: this.wind.speed * this.bobRadius * Math.sin(this.wind.angle) * -1,
+        };
+        const resultingForce = {
+            x: gForce.x + windForce.x,
+            y: gForce.y + windForce.y,
+        };
+
+        const forceMagnitude = Math.sqrt(resultingForce.x ** 2 + resultingForce.y ** 2);
+        const forceAngle = computeAngle({ x: 0, y: 0 }, resultingForce);
+
+        const angleToForce = angle - forceAngle;
+        const acceleration = forceMagnitude * Math.sin(angleToForce);
+
         // Update speed
-        const angleToGravity = angle - degreesToRadians(90); // Angle with g force
-        const acceleration = this.gravity * Math.sin(angleToGravity);
         this.speed += acceleration * tickTimeSeconds;
 
         // Get distance traveled
