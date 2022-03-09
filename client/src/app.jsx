@@ -1,7 +1,7 @@
 import "./app.css";
 
 import React from "react";
-import { PendulumsCanvas } from "components/pendulums-canvas";
+import { PendulumsCanvas } from "components/PendulumsCanvas";
 
 export function App() {
     return (

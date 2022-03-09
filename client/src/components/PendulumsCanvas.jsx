@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { getMouseCoords, getMouseDelta, HttpClient } from "utils";
-import { Canvas } from "components/canvas";
-import { SERVER_URL, PENDULUM_ENDPOINT, START_ENDPOINT, PAUSE_ENDPOINT, STOP_ENDPOINT, REFRESH_PERIOD } from "constants";
-import { TextButton, Circle, Pendulum } from "./shapes";
-import { Poller } from "./poller";
+import { getMouseCoords, getMouseDelta } from "utils";
+import { Canvas } from "components/Canvas";
+import { SERVER_URL, PENDULUM_ENDPOINT, REFRESH_PERIOD } from "constants";
+import { Circle, Pendulum } from "./shapes";
+import { Poller } from "./Poller";
+import { SimulationStates } from "./simulation-states";
+import { StartButton, PauseButton, StopButton } from "./buttons";
 
 const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
 const ROD_WIDTH = 4;
-
-export const SimulationStates = {
-    STARTED: "started",
-    PAUSED: "paused",
-    STOPPED: "stopped",
-};
+const BUTTOM_BOTTOM_MARGIN = 15;
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [state, setState] = useState(SimulationStates.STOPPED);
     const [poll, setPoll] = useState(false);
+
     const [pendulums] = useState([1, 2, 3, 4, 5].map(i =>
         ({
             shape: new Pendulum(
@@ -29,51 +27,9 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         })
     ));
 
-    const [startButton] = useState(new TextButton(1 * width / 4, height - 15, "START", {
-        onClick: async () => {
-            for (const pendulum of pendulums) {
-                await HttpClient.post(`${pendulum.server}/${START_ENDPOINT}`, pendulum.shape.toJson())
-            }
-
-            setPoll(true);
-            setState(SimulationStates.STARTED);
-        },
-        backgroundColor: "green",
-        textColor: "darkblue",
-        disabled: false
-    }));
-
-    const [pauseButton] = useState(new TextButton(2 * width / 4, height - 15, "PAUSE", {
-        onClick: async () => {
-            setPoll(false);
-            for (const pendulum of pendulums) {
-                await HttpClient.post(`${pendulum.server}/${PAUSE_ENDPOINT}`, pendulum.shape.toJson())
-            }
-            setState(SimulationStates.PAUSED);
-        },
-        backgroundColor: "green",
-        textColor: "darkblue",
-        disabled: true
-    }));
-
-    const [stopButton] = useState(new TextButton(3 * width / 4, height - 15, "STOP", {
-        onClick: async () => {
-            setPoll(false);
-            for (const pendulum of pendulums) {
-                const response = await HttpClient.post(`${pendulum.server}/${STOP_ENDPOINT}`, pendulum.shape.toJson())
-                if (response.status === 200) {
-                    const json = await response.json();
-                    pendulum.shape.bob.x = json.bobPosition.x;
-                    pendulum.shape.bob.y = json.bobPosition.y;
-                }
-            }
-
-            setState(SimulationStates.STOPPED);
-        },
-        backgroundColor: "green",
-        textColor: "darkblue",
-        disabled: true
-    }));
+    const [startButton] = useState(StartButton(1 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [pauseButton] = useState(PauseButton(2 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [stopButton] = useState(StopButton(3 * width / 4, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
 
     useEffect(() => {
         if (state === SimulationStates.STARTED) {
@@ -98,7 +54,6 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         stopButton.render(ctx);
     }, [pendulums, startButton, pauseButton, stopButton]);
 
-
     const mouseDown = useCallback(e => {
         const position = getMouseCoords(e);
 
@@ -107,7 +62,6 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         pauseButton.mouseDown(position);
         stopButton.mouseDown(position);
     }, [pendulums, startButton, pauseButton, stopButton]);
-
 
     const mouseMove = useCallback(e => {
         const position = getMouseCoords(e);
@@ -118,7 +72,6 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         pauseButton.mouseMove(position, delta);
         stopButton.mouseMove(position, delta);
     }, [pendulums, startButton, pauseButton, stopButton]);
-
 
     const mouseUp = useCallback(e => {
         const position = getMouseCoords(e);
