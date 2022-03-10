@@ -59,19 +59,19 @@ export class TextButton extends Shape {
     }
 
     onMouseDown(position) {
-        if (this.buttonBox) {
+        if (this.buttonBox && !this.disabled) {
             this.buttonBox.onMouseDown(position);
         }
     }
 
     onMouseMove(position, delta) {
-        if (this.buttonBox) {
+        if (this.buttonBox && !this.disabled) {
             this.buttonBox.onMouseMove(position, delta);
         }
     }
 
     onMouseUp(position) {
-        if (this.buttonBox) {
+        if (this.buttonBox && !this.disabled) {
             this.buttonBox.onMouseUp(position);
         }
     }

@@ -36,30 +36,23 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         })
     ));
 
-    const [startButton] = useState(StartButton(1 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
-    const [pauseButton] = useState(PauseButton(2 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
-    const [resetButton] = useState(ResetButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
+    const [startButton] = useState(StartButton(1 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setState));
+    const [pauseButton] = useState(PauseButton(2 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setState));
+    const [resetButton] = useState(ResetButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setState));
     const [windCompass] = useState(WindCompass(width - 75, height - 75, pendulums));
 
     useEffect(() => {
         setInteractionsEnabed(state === SimulationStates.STOPPED);
-    }, [state, setInteractionsEnabed])
+    }, [state, setInteractionsEnabed]);
 
-    // TODO Have the server tell the state
     useEffect(() => {
-        if (state === SimulationStates.STARTED) {
-            startButton.disabled = true;
-            pauseButton.disabled = false;
-            resetButton.disabled = false;
-        } else if (state === SimulationStates.PAUSED) {
-            startButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = false;
-        } else if (state === SimulationStates.STOPPED) {
-            startButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = true;
-        }
+        setPoll(state !== SimulationStates.STOPPED);
+    }, [state, setPoll]);
+
+    useEffect(() => {
+        startButton.disabled = [SimulationStates.STARTED, SimulationStates.RESTARTING].includes(state);
+        pauseButton.disabled = state !== SimulationStates.STARTED;
+        resetButton.disabled = state === SimulationStates.STOPPED;
     }, [state, setState, startButton, pauseButton, resetButton])
 
     const draw = useCallback(ctx => {
@@ -115,7 +108,18 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     return (
         <>
             {pendulums.map(({ shape, server }) => (
-                <Poller key={server} shape={shape} url={`${server}/${PENDULUM_ENDPOINT}`} pollingPeriod={REFRESH_PERIOD} poll={poll} />
+                <Poller
+                    key={server}
+                    shape={shape}
+                    url={`${server}/${PENDULUM_ENDPOINT}`}
+                    pollingPeriod={REFRESH_PERIOD}
+                    poll={poll}
+                    onPoll={json => {
+                        shape.bob.x = json.bobPosition.x;
+                        shape.bob.y = json.bobPosition.y;
+                        setState(json.status);
+                    }}
+                />
             ))}
             <Canvas draw={draw} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} width={width} height={height} {...canvasProps} />
         </>

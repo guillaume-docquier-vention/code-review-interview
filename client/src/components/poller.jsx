@@ -1,12 +1,9 @@
 import { usePolling } from "hooks";
 import { useEffect } from "react";
 
-export const Poller = ({ shape, url, pollingPeriod, poll }) => {
+export const Poller = ({ url, pollingPeriod, poll, onPoll }) => {
     // TODO This is bound to a pendulum
-    const polling = usePolling(url, pollingPeriod, json => {
-        shape.bob.x = json.bobPosition.x;
-        shape.bob.y = json.bobPosition.y;
-    });
+    const polling = usePolling(url, pollingPeriod, onPoll);
 
     useEffect(() => {
         if (poll) {

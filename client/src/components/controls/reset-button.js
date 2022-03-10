@@ -3,10 +3,9 @@ import { SimulationStates } from "components/simulation-states";
 import { RESET_ENDPOINT } from "constants";
 import { HttpClient } from "utils";
 
-export const ResetButton = (x, y, pendulums, setPoll, setState) => {
+export const ResetButton = (x, y, pendulums, setState) => {
     return new TextButton(x, y, "RESET", {
         onClick: async () => {
-            setPoll(false);
             for (const pendulum of pendulums) {
                 const response = await HttpClient.post(`${pendulum.server}/${RESET_ENDPOINT}`, pendulum.shape.toJson())
                 if (response.status === 200) {
