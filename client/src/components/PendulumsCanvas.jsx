@@ -11,6 +11,8 @@ const PIVOT_RADIUS = 6;
 const PENDULUM_RADIUS = 20;
 const ROD_WIDTH = 4;
 const BUTTOM_BOTTOM_MARGIN = 15;
+const PENDULUM_COUNT = 5;
+const PENDULUM_INDEXES = Array.from({ length: PENDULUM_COUNT }, (_, i) => i + 1);
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [state, setState] = useState(SimulationStates.STOPPED);
@@ -22,7 +24,7 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         4
     ));
 
-    const [pendulums] = useState([1, 2, 3, 4, 5].map(i =>
+    const [pendulums] = useState(PENDULUM_INDEXES.map(i =>
         ({
             shape: new Pendulum(
                 new Circle(i * width / 6, anchor.start.y, PIVOT_RADIUS, { dragAxis: { x: true } }),

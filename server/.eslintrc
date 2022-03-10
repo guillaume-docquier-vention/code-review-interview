@@ -16,6 +16,8 @@
         "indent": [1, 4],
         "arrow-parens": [1, "as-needed"],
         "max-len": [1, 140],
-        "import/prefer-default-export": 0
+        "import/prefer-default-export": 0,
+        "no-restricted-syntax": 0,
+        "no-await-in-loop": 0
     }
 }

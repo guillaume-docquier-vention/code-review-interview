@@ -1,5 +1,5 @@
-import { MS_PER_SECONDS } from "../constants";
-import { computeAngle, degreesToRadians } from "../angles";
+import { computeAngle, degreesToRadians, getDistance } from "../../utils";
+import { MS_PER_SECONDS } from "../../constants";
 
 export class Pendulum {
     constructor(pivotPosition, bobPosition, angle, mass, bobRadius, wind, gravity) {
@@ -31,7 +31,7 @@ export class Pendulum {
     }
 
     get rodLength() {
-        return Math.sqrt((this.pivotPosition.x - this.bobPosition.x) ** 2 + (this.pivotPosition.y - this.bobPosition.y) ** 2);
+        return getDistance(this.pivotPosition, this.bobPosition);
     }
 
     tick(tickTimeMs) {
@@ -78,6 +78,12 @@ export class Pendulum {
         this.wind = { ...this.initialState.wind };
         this.gravity = this.initialState.gravity;
         this.speed = this.initialState.speed;
+    }
+
+    detectCollision(pendulum) {
+        const distanceBetweenPendulums = getDistance(pendulum.bobPosition, this.bobPosition);
+
+        return distanceBetweenPendulums <= pendulum.bobRadius + this.bobRadius;
     }
 
     toJson() {
