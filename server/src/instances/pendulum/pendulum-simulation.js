@@ -5,6 +5,7 @@ export const Statuses = {
     STARTED: "started",
     PAUSED: "paused",
     STOPPED: "stopped",
+    RESTARTING: "restarting",
 };
 
 export class PendulumSimulation {

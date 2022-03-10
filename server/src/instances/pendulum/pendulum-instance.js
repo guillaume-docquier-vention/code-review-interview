@@ -6,10 +6,13 @@ import { Instance } from "../instance";
 import { MS_PER_SECONDS } from "../../constants";
 import { PendulumSimulation } from "./pendulum-simulation";
 
+const PAUSE_AFTER_COLLISION = 5_000;
+
 export class PendulumInstance extends Instance {
     constructor(port, clientUrl) {
         super(port, clientUrl);
 
+        this.restartMessages = null;
         this.simulation = new PendulumSimulation(
             MS_PER_SECONDS / 30,
             this.getOtherPendulums.bind(this),
@@ -22,6 +25,9 @@ export class PendulumInstance extends Instance {
         app.post("/start", this.startSimulation.bind(this));
         app.post("/pause", this.pauseSimulation.bind(this));
         app.post("/reset", this.resetSimulation.bind(this));
+
+        app.post("/collision", this.handleCollision.bind(this));
+        app.post("/restart", this.handleRestartSequence.bind(this));
     }
 
     getPendulum(req, res) {
@@ -61,6 +67,30 @@ export class PendulumInstance extends Instance {
         return res.json(this.simulation.state);
     }
 
+    handleCollision() {
+        this.simulation.pause();
+        if (this.restartMessages === null) {
+            this.restartMessages = this.getRestartMessages();
+            setTimeout(() => {
+                this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/restart`, { json: { id: this.url } }));
+            }, PAUSE_AFTER_COLLISION);
+
+            // eslint-disable-next-line no-console
+            console.log(`[${new Date().toISOString()}] Collision reported on ${this.port}`);
+        }
+    }
+
+    handleRestartSequence(req) {
+        this.restartMessages[req.body.id] = true;
+        if (Object.values(this.restartMessages).every(isTrue => isTrue)) {
+            this.simulation.reset();
+            this.restartMessages = null;
+
+            // eslint-disable-next-line no-console
+            console.log(`[${new Date().toISOString()}] Simulation restarted on ${this.port}`);
+        }
+    }
+
     async getOtherPendulums() {
         const pendulumRequests = this.neighborUrls.map(neighborUrl => got.get(`${neighborUrl}/pendulum`).json().catch(() => null));
         const pendulums = await Promise.all(pendulumRequests);
@@ -69,7 +99,16 @@ export class PendulumInstance extends Instance {
     }
 
     onCollision() {
-        this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/reset`).catch(() => null));
-        this.simulation.reset();
+        this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/collision`).catch(() => null));
+        this.handleCollision();
+    }
+
+    getRestartMessages() {
+        return this.neighborUrls.reduce((messages, neighborUrl) => {
+            // eslint-disable-next-line no-param-reassign
+            messages[neighborUrl] = false;
+
+            return messages;
+        }, {});
     }
 }
