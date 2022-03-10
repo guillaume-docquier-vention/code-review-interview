@@ -12,8 +12,6 @@ export const StartButton = (x, y, pendulums, setState) => {
 
             setState(SimulationStates.STARTED);
         },
-        backgroundColor: "green",
-        textColor: "darkblue",
         disabled: false
     });
 };

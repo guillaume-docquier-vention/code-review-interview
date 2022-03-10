@@ -1,4 +1,4 @@
-import { degreesToRadians } from "utils";
+import { Colors, degreesToRadians } from "utils";
 import { Shape } from "./shape";
 
 export class Line extends Shape {
@@ -10,8 +10,8 @@ export class Line extends Shape {
         this.width = width;
 
         this.dragAxis = options.dragAxis || { x: true, y: true };
-        this.fillStyle = options.fillStyle || "darkred";
-        this.strokeStyle = options.strokeStyle || "black";
+        this.fillStyle = options.fillStyle || Colors.SECONDARY;
+        this.strokeStyle = options.strokeStyle || Colors.PRIMARY;
 
         this._mousedDown = false;
         this._isDragging = false;

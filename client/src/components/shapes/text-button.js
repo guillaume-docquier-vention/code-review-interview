@@ -1,5 +1,6 @@
 import { Rectangle } from "./rectangle";
 import { Shape } from "./shape";
+import{ Colors } from "utils";
 
 export class TextButton extends Shape {
     constructor(x, y, text, options) {
@@ -10,8 +11,8 @@ export class TextButton extends Shape {
         this.text = text;
 
         this.onClick = options.onClick;
-        this.backgroundColor = options.backgroundColor || "blue";
-        this.textColor = options.textColor || "darkred";
+        this.backgroundColor = options.backgroundColor || Colors.PRIMARY;
+        this.textColor = options.textColor || Colors.PRIMARY_TEXT;
         this.disabled = options.disabled;
 
         this.buttonBox = null;
@@ -43,17 +44,16 @@ export class TextButton extends Shape {
 
         ctx.beginPath();
         ctx.fillStyle = this.backgroundColor;
+        if (this.disabled) {
+            ctx.fillStyle = "#9EADC7";
+        }
         this.buttonBox.render(ctx);
 
         ctx.fillStyle = this.textColor;
-        ctx.fillText(this.text, this.x, this.y);
-
         if (this.disabled) {
-            ctx.globalAlpha = 0.7;
-            ctx.fillStyle = "black";
-            this.buttonBox.render(ctx);
-            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#CED7E5";
         }
+        ctx.fillText(this.text, this.x, this.y);
 
         ctx.closePath();
     }

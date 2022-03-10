@@ -1,4 +1,4 @@
-import { computeAngle, degreesToRadians, rotate } from "utils";
+import { Colors, computeAngle, degreesToRadians, rotate } from "utils";
 import { Circle } from "./circle";
 import { Line } from "./line";
 import { Shape } from "./shape";
@@ -13,7 +13,7 @@ export class Arrow extends Shape {
         this._mousedDown = false;
         this._isDragging = false;
 
-        this.lineOptions = { strokeStyle: "yellow" };
+        this.lineOptions = { strokeStyle: Colors.COMMUNITY };
         this.shaft = new Line(start, end, width, this.lineOptions);
         this.setHeads();
 

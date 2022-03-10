@@ -1,4 +1,4 @@
-import { degreesToRadians } from "utils";
+import { Colors, degreesToRadians } from "utils";
 import { Shape } from "./shape";
 
 const DEFAULT_LINE_WIDTH = 2;
@@ -11,8 +11,8 @@ export class Circle extends Shape {
         this.radius = radius;
 
         this.dragAxis = options.dragAxis || { x: true, y: true };
-        this.fillStyle = options.fillStyle || "darkred";
-        this.strokeStyle = options.strokeStyle || "black";
+        this.fillStyle = options.fillStyle || Colors.SECONDARY;
+        this.strokeStyle = options.strokeStyle || Colors.PRIMARY;
         this.lineWidth = options.lineWidth || DEFAULT_LINE_WIDTH;
 
         this._mousedDown = false;

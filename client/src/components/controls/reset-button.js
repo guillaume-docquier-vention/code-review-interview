@@ -17,8 +17,6 @@ export const ResetButton = (x, y, pendulums, setState) => {
 
             setState(SimulationStates.STOPPED);
         },
-        backgroundColor: "green",
-        textColor: "darkblue",
         disabled: true
     });
 };

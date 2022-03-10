@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { useCallback } from "react";
+import { Colors } from "utils";
 
 export const Canvas = ({ draw, ...canvasProps }) => {
     const canvasRef = useRef(null);
 
     const addCenterMark = useCallback(ctx => {
-        ctx.strokeStyle = "greenyellow";
+        ctx.strokeStyle = Colors.PRIMARY;
         ctx.lineWidth = 3;
 
         const center = {

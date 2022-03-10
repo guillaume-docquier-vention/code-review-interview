@@ -11,6 +11,7 @@ export class Rectangle extends Shape {
 
         this.onClick = options.onClick;
         this.isDraggable = !!options.isDraggable;
+        this.stroked = options.stroked;
 
         this._mousedDown = false;
         this._isDragging = false;
@@ -24,7 +25,11 @@ export class Rectangle extends Shape {
     }
 
     render(ctx) {
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        if (this.stroked) {
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        } else {
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
     }
 
     onMouseDown(position) {

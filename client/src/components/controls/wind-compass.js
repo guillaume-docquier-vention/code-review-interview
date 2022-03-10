@@ -1,5 +1,5 @@
 import { Circle, Compass } from "components/shapes";
-import { radiansToDegrees } from "utils";
+import { radiansToDegrees, Colors } from "utils";
 
 const COMPASS_RADIUS = 60;
 
@@ -14,7 +14,7 @@ export const WindCompass = (x, y, pendulums) => {
                     pendulum.shape.wind.angle = angle;
                 });
             },
-            backgroundColor: "CornflowerBlue"
+            backgroundColor: Colors.ACCENT
         }
     );
 }

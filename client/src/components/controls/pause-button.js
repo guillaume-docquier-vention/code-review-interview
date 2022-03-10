@@ -11,8 +11,6 @@ export const PauseButton = (x, y, pendulums, setState) => {
             }
             setState(SimulationStates.PAUSED);
         },
-        backgroundColor: "green",
-        textColor: "darkblue",
         disabled: true
     });
 }
