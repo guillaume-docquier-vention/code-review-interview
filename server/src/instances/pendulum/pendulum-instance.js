@@ -48,9 +48,7 @@ export class PendulumInstance extends Instance {
     }
 
     pauseSimulation(req, res) {
-        if (!this.simulation.pause()) {
-            return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
-        }
+        this.simulation.pause();
 
         // eslint-disable-next-line no-console
         console.log(`[${new Date().toISOString()}] Simulation paused on ${this.port}`);
@@ -58,9 +56,7 @@ export class PendulumInstance extends Instance {
     }
 
     resetSimulation(req, res) {
-        if (!this.simulation.reset()) {
-            return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
-        }
+        this.simulation.reset();
 
         // eslint-disable-next-line no-console
         console.log(`[${new Date().toISOString()}] Simulation reset on ${this.port}`);
@@ -68,8 +64,8 @@ export class PendulumInstance extends Instance {
     }
 
     handleCollision() {
-        this.simulation.pause();
-        if (this.restartMessages === null) {
+        this.simulation.initRestart();
+        if (!this.restartMessages) {
             this.restartMessages = this.getRestartMessages();
             setTimeout(() => {
                 this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/restart`, { json: { id: this.url } }));
@@ -83,7 +79,7 @@ export class PendulumInstance extends Instance {
     handleRestartSequence(req) {
         this.restartMessages[req.body.id] = true;
         if (Object.values(this.restartMessages).every(isTrue => isTrue)) {
-            this.simulation.reset();
+            this.simulation.restart();
             this.restartMessages = null;
 
             // eslint-disable-next-line no-console

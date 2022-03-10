@@ -16,6 +16,7 @@ const PENDULUM_INDEXES = Array.from({ length: PENDULUM_COUNT }, (_, i) => i + 1)
 
 export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [state, setState] = useState(SimulationStates.STOPPED);
+    const [interactionsEnabed, setInteractionsEnabed] = useState(true);
     const [poll, setPoll] = useState(false);
 
     const [anchor] = useState(new Line(
@@ -39,6 +40,10 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
     const [pauseButton] = useState(PauseButton(2 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
     const [resetButton] = useState(ResetButton(3 * width / 4.5, height - BUTTOM_BOTTOM_MARGIN, pendulums, setPoll, setState));
     const [windCompass] = useState(WindCompass(width - 75, height - 75, pendulums));
+
+    useEffect(() => {
+        setInteractionsEnabed(state === SimulationStates.STOPPED);
+    }, [state, setInteractionsEnabed])
 
     // TODO Have the server tell the state
     useEffect(() => {
@@ -66,37 +71,46 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         windCompass.render(ctx);
     }, [anchor, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
-    // TODO Disable most drags and clicks while simulation is running
     const mouseDown = useCallback(e => {
         const position = getMouseCoords(e);
 
-        pendulums.forEach(pendulum => pendulum.shape.mouseDown(position));
+        if (interactionsEnabed) {
+            pendulums.forEach(pendulum => pendulum.shape.mouseDown(position));
+            windCompass.mouseDown(position);
+        }
+
         startButton.mouseDown(position);
         pauseButton.mouseDown(position);
         resetButton.mouseDown(position);
-        windCompass.mouseDown(position);
-    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
+
+    }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     const mouseMove = useCallback(e => {
         const position = getMouseCoords(e);
         const delta = getMouseDelta(e);
 
-        pendulums.forEach(pendulum => pendulum.shape.mouseMove(position, delta));
+        if (interactionsEnabed) {
+            pendulums.forEach(pendulum => pendulum.shape.mouseMove(position, delta));
+            windCompass.mouseMove(position, delta);
+        }
+
         startButton.mouseMove(position, delta);
         pauseButton.mouseMove(position, delta);
         resetButton.mouseMove(position, delta);
-        windCompass.mouseMove(position, delta);
-    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
+    }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     const mouseUp = useCallback(e => {
         const position = getMouseCoords(e);
 
-        pendulums.forEach(pendulum => pendulum.shape.mouseUp(position));
+        if (interactionsEnabed) {
+            pendulums.forEach(pendulum => pendulum.shape.mouseUp(position));
+            windCompass.mouseUp(position);
+        }
+
         startButton.mouseUp(position);
         pauseButton.mouseUp(position);
         resetButton.mouseUp(position);
-        windCompass.mouseUp(position);
-    }, [pendulums, startButton, pauseButton, resetButton, windCompass]);
+    }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     return (
         <>

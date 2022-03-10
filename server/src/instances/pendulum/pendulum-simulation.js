@@ -20,7 +20,10 @@ export class PendulumSimulation {
     }
 
     get state() {
-        return this.pendulum?.toJson();
+        return {
+            ...this.pendulum?.toJson(),
+            status: this.status,
+        };
     }
 
     start(pendulumJson) {
@@ -39,31 +42,28 @@ export class PendulumSimulation {
         this.status = Statuses.STARTED;
         clearInterval(this.simulationInterval);
         this.simulationInterval = setInterval(() => this.tick(this.tickPeriod), this.tickPeriod);
-
-        return true;
     }
 
     pause() {
-        if (this.status !== Statuses.STARTED) {
-            return false;
-        }
-
         this.status = Statuses.PAUSED;
         clearInterval(this.simulationInterval);
-
-        return true;
     }
 
     reset() {
-        if (this.status === Statuses.STOPPED) {
-            return false;
-        }
-
         this.status = Statuses.STOPPED;
         clearInterval(this.simulationInterval);
         this.pendulum.reset();
+    }
 
-        return true;
+    initRestart() {
+        this.pause();
+        this.status = Statuses.RESTARTING;
+    }
+
+    restart() {
+        if (this.status === Statuses.RESTARTING) {
+            this.reset();
+        }
     }
 
     async tick(tickPeriod) {
