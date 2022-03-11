@@ -33,3 +33,8 @@ Move a bob anywhere by dragging it.
 Change the wind direction by dragging the compass arrow.  
 
 Start, pause and stop the simulation by using the buttons.  
+
+## Issues
+
+Improve the management of the simulation state. Since there is no central server, the simulation state must be inferred from the state of all pendulums.  
+The current method is easy, but fragile. Networks lags can easily cause the frontend state to be wrong.

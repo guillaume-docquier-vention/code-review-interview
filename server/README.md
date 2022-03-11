@@ -1,6 +1,7 @@
 # Vention Take Home Exercise - Server
 This javascript backend uses NodeJS and Express to serve an APIs that expose pendulums states.  
-It simulates nodes being run on different machines.  
+It simulates nodes being run on different machines with P2P synchronization.  
+This is why they communicate via HTTP rather than sharing state or using IPC.  
 
 ## Development setup
 
