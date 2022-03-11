@@ -30,8 +30,10 @@ export class Compass extends Shape {
 
     // TODO Abstract clicked and drag flags
     onMouseDown(position) {
-        this.arrow.onMouseDown(position);
-        this._mousedDown = true;
+        if (this.contains(position)) {
+            this.arrow.onMouseDown(position);
+            this._mousedDown = true;
+        }
     }
 
     onMouseMove(position, delta) {

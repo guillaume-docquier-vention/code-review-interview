@@ -64,45 +64,45 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
         windCompass.render(ctx);
     }, [anchor, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
-    const mouseDown = useCallback(e => {
+    const onMouseDown = useCallback(e => {
         const position = getMouseCoords(e);
 
         if (interactionsEnabed) {
-            pendulums.forEach(pendulum => pendulum.shape.mouseDown(position));
-            windCompass.mouseDown(position);
+            pendulums.forEach(pendulum => pendulum.shape.onMouseDown(position));
+            windCompass.onMouseDown(position);
         }
 
-        startButton.mouseDown(position);
-        pauseButton.mouseDown(position);
-        resetButton.mouseDown(position);
+        startButton.onMouseDown(position);
+        pauseButton.onMouseDown(position);
+        resetButton.onMouseDown(position);
 
     }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
-    const mouseMove = useCallback(e => {
+    const onMouseMove = useCallback(e => {
         const position = getMouseCoords(e);
         const delta = getMouseDelta(e);
 
         if (interactionsEnabed) {
-            pendulums.forEach(pendulum => pendulum.shape.mouseMove(position, delta));
-            windCompass.mouseMove(position, delta);
+            pendulums.forEach(pendulum => pendulum.shape.onMouseMove(position, delta));
+            windCompass.onMouseMove(position, delta);
         }
 
-        startButton.mouseMove(position, delta);
-        pauseButton.mouseMove(position, delta);
-        resetButton.mouseMove(position, delta);
+        startButton.onMouseMove(position, delta);
+        pauseButton.onMouseMove(position, delta);
+        resetButton.onMouseMove(position, delta);
     }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
-    const mouseUp = useCallback(e => {
+    const onMouseUp = useCallback(e => {
         const position = getMouseCoords(e);
 
         if (interactionsEnabed) {
-            pendulums.forEach(pendulum => pendulum.shape.mouseUp(position));
-            windCompass.mouseUp(position);
+            pendulums.forEach(pendulum => pendulum.shape.onMouseUp(position));
+            windCompass.onMouseUp(position);
         }
 
-        startButton.mouseUp(position);
-        pauseButton.mouseUp(position);
-        resetButton.mouseUp(position);
+        startButton.onMouseUp(position);
+        pauseButton.onMouseUp(position);
+        resetButton.onMouseUp(position);
     }, [interactionsEnabed, pendulums, startButton, pauseButton, resetButton, windCompass]);
 
     return (
@@ -121,7 +121,7 @@ export const PendulumsCanvas = ({ width, height, ...canvasProps}) => {
                     }}
                 />
             ))}
-            <Canvas draw={draw} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} width={width} height={height} {...canvasProps} />
+            <Canvas draw={draw} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} width={width} height={height} {...canvasProps} />
         </>
     );
 };

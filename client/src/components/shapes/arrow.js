@@ -65,7 +65,9 @@ export class Arrow extends Shape {
     }
 
     onMouseDown(position) {
-        this._mousedDown = true;
+        if (this.contains(position)) {
+            this._mousedDown = true;
+        }
     }
 
     onMouseMove(position, delta) {
@@ -86,9 +88,6 @@ export class Arrow extends Shape {
 
             this.setHeads();
         }
-    }
-
-    drag(delta) {
     }
 
     onMouseUp(position) {

@@ -41,7 +41,9 @@ export class Circle extends Shape {
     }
 
     onMouseDown(position) {
-        this._mousedDown = true;
+        if (this.contains(position)) {
+            this._mousedDown = true;
+        }
     }
 
     onMouseMove(position, delta) {

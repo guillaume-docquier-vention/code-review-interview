@@ -31,22 +31,22 @@ export class Pendulum extends Shape {
         this.bob.render(ctx);
     }
 
-    mouseDown(position) {
-        this.pivot.mouseDown(position);
-        this.bob.mouseDown(position);
-        this.rod.mouseDown(position);
+    onMouseDown(position) {
+        this.pivot.onMouseDown(position);
+        this.bob.onMouseDown(position);
+        this.rod.onMouseDown(position);
     }
 
-    mouseMove(position, delta) {
-        this.pivot.mouseMove(position, delta);
-        this.bob.mouseMove(position, delta);
-        this.rod.mouseMove(position, delta);
+    onMouseMove(position, delta) {
+        this.pivot.onMouseMove(position, delta);
+        this.bob.onMouseMove(position, delta);
+        this.rod.onMouseMove(position, delta);
     }
 
-    mouseUp(position) {
-        this.pivot.mouseUp(position);
-        this.bob.mouseUp(position);
-        this.rod.mouseUp(position);
+    onMouseUp(position) {
+        this.pivot.onMouseUp(position);
+        this.bob.onMouseUp(position);
+        this.rod.onMouseUp(position);
     }
 
     // TODO We're mixing model and shape
