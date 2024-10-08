@@ -2,12 +2,14 @@ import { EARTH_GRAVITY } from "../../constants";
 import { Pendulum } from "./Pendulum";
 import type { PendulumJson } from './PendulumJson'
 
-export enum Status {
+enum Status {
     STARTED = "started",
     PAUSED = "paused",
     STOPPED = "stopped",
     RESTARTING = "restarting",
 }
+
+type PendulumSimulationState = PendulumJson & { status: Status }
 
 export class PendulumSimulation {
     private readonly tickPeriod: number
@@ -26,9 +28,9 @@ export class PendulumSimulation {
         this.pendulum = null;
     }
 
-    public get state() {
+    public get state(): PendulumSimulationState {
         return {
-            ...this.pendulum?.toJson(),
+            ...this.pendulum!.toJson(),
             status: this.status,
         };
     }
