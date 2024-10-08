@@ -2,6 +2,12 @@ import { Pendulum } from './Pendulum'
 import { EARTH_GRAVITY, NO_WIND } from '../../constants'
 
 describe('Pendulum', () => {
+  describe('tick', () => {
+    it('should be tested more', () => {
+      // TODO Add tests for tick()
+    });
+  });
+
   describe('get rodLength', () => {
     it('should return the length of the rod', () => {
       // Arrange
