@@ -1,5 +1,3 @@
-// @ts-expect-error -- This is not compatible with commonjs, which we compile to (works using tsx however)
-import got from "got";
 import { StatusCodes } from "http-status-codes";
 
 import { Instance } from "../instance";
@@ -72,7 +70,13 @@ export class PendulumInstance extends Instance {
         if (this.restartMessages === null) {
             this.restartMessages = this.getRestartMessages();
             setTimeout(() => {
-                this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/restart`, { json: { id: this.url } }));
+                this.neighborUrls.forEach(neighborUrl => fetch(`${neighborUrl}/restart`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: this.url })
+                }))
             }, PAUSE_AFTER_COLLISION);
 
             console.log(`[${new Date().toISOString()}] Collision reported on ${this.port}`);
@@ -91,14 +95,14 @@ export class PendulumInstance extends Instance {
 
     private async getOtherPendulums(): Promise<PendulumJson[]> {
         const pendulumRequests = this.neighborUrls
-          .map(neighborUrl => got.get(`${neighborUrl}/pendulum`).json().catch(() => null)) as Promise<PendulumJson | null>[];
+          .map(neighborUrl => fetch(`${neighborUrl}/pendulum`).then(response => response.json()).catch(() => null)) as Promise<PendulumJson | null>[];
         const pendulums = await Promise.all(pendulumRequests);
 
         return pendulums.filter(p => p !== null);
     }
 
     private onCollision(): void {
-        this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/collision`).catch(() => null));
+        this.neighborUrls.forEach(neighborUrl => fetch(`${neighborUrl}/collision`, { method: "POST" }));
         this.handleCollision();
     }
 
