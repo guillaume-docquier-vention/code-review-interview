@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "tsx watch src/app.ts",
+    "typecheck": "tsc --noEmit",
     "test": "jest"
   },
   "author": "Guillaume Docquier",
