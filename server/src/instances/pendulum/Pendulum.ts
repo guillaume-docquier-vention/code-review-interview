@@ -116,7 +116,7 @@ export class Pendulum {
         return radianAngle;
     }
 
-    private get rodLength(): number {
-        return Math.sqrt((this.pivotPosition.x - this.bobPosition.y) ** 2 + (this.pivotPosition.y - this.bobPosition.y) ** 2);
+    public get rodLength(): number {
+        return Math.sqrt((this.pivotPosition.x - this.bobPosition.x) ** 2 + (this.pivotPosition.y - this.bobPosition.y) ** 2);
     }
 }
