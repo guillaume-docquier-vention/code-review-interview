@@ -1,9 +1,13 @@
+import type { PendulumInstance } from './pendulum'
+
 export class Cluster {
-    constructor(instances) {
+    private readonly instances: PendulumInstance[]
+
+    public constructor(instances: PendulumInstance[]) {
         this.instances = instances;
     }
 
-    start() {
+    public start(): void {
         const instanceUrls = this.instances.map(instance => instance.url);
         this.instances.forEach(instance => {
             instance.updateNeighbors(instanceUrls.filter(url => url !== instance.url));

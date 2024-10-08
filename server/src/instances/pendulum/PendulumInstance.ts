@@ -1,15 +1,20 @@
-// eslint-disable-next-line import/no-unresolved
+// @ts-expect-error -- This is not compatible with commonjs, which we compile to (works using tsx however)
 import got from "got";
 import { StatusCodes } from "http-status-codes";
 
 import { Instance } from "../instance";
 import { MS_PER_SECONDS } from "../../constants";
-import { PendulumSimulation } from "./pendulum-simulation";
+import { PendulumSimulation } from "./PendulumSimulation";
+import type { Express, Request, Response } from 'express'
+import type { PendulumJson } from './PendulumJson'
 
 const PAUSE_AFTER_COLLISION = 5_000;
 
 export class PendulumInstance extends Instance {
-    constructor(port, clientUrl) {
+    private restartMessages: Record<string, boolean> | null
+    private readonly simulation: PendulumSimulation
+
+    constructor(port: number, clientUrl: string) {
         super(port, clientUrl);
 
         this.restartMessages = null;
@@ -20,7 +25,7 @@ export class PendulumInstance extends Instance {
         );
     }
 
-    setupRoutes(app) {
+    protected override setupRoutes(app: Express): void {
         app.get("/pendulum", this.getPendulum.bind(this));
         app.post("/start", this.startSimulation.bind(this));
         app.post("/pause", this.pauseSimulation.bind(this));
@@ -30,81 +35,78 @@ export class PendulumInstance extends Instance {
         app.post("/restart", this.handleRestartSequence.bind(this));
     }
 
-    getPendulum(req, res) {
+    private getPendulum(req: Request, res: Response): void {
         const { state } = this.simulation;
         if (!state) {
-            return res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
+            res.sendStatus(StatusCodes.PRECONDITION_REQUIRED);
+            return
         }
 
-        return res.json(state);
+        res.json(state);
+        return
     }
 
-    startSimulation(req, res) {
-        this.simulation.start(req.body, this.neighborUrls);
+    private startSimulation(req: Request, res: Response): void {
+        this.simulation.start(req.body);
 
-        // eslint-disable-next-line no-console
         console.log(`[${new Date().toISOString()}] Simulation started on ${this.port}`);
-        return res.sendStatus(StatusCodes.CREATED);
+        res.sendStatus(StatusCodes.CREATED);
     }
 
-    pauseSimulation(req, res) {
+    private pauseSimulation(req: Request, res: Response): void {
         this.simulation.pause();
 
-        // eslint-disable-next-line no-console
         console.log(`[${new Date().toISOString()}] Simulation paused on ${this.port}`);
-        return res.sendStatus(StatusCodes.OK);
+        res.sendStatus(StatusCodes.OK);
     }
 
-    resetSimulation(req, res) {
+    private resetSimulation(req: Request, res: Response): void {
         this.simulation.reset();
 
-        // eslint-disable-next-line no-console
         console.log(`[${new Date().toISOString()}] Simulation reset on ${this.port}`);
-        return res.json(this.simulation.state);
+        res.json(this.simulation.state);
     }
 
-    handleCollision() {
+    private handleCollision() {
         this.simulation.initRestart();
-        if (!this.restartMessages) {
+        if (this.restartMessages === null) {
             this.restartMessages = this.getRestartMessages();
             setTimeout(() => {
                 this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/restart`, { json: { id: this.url } }));
             }, PAUSE_AFTER_COLLISION);
 
-            // eslint-disable-next-line no-console
             console.log(`[${new Date().toISOString()}] Collision reported on ${this.port}`);
         }
     }
 
-    handleRestartSequence(req) {
-        this.restartMessages[req.body.id] = true;
-        if (Object.values(this.restartMessages).every(isTrue => isTrue)) {
+    private handleRestartSequence(req: Request): void {
+        this.restartMessages![req.body.id] = true;
+        if (Object.values(this.restartMessages!).every(isTrue => isTrue)) {
             this.simulation.restart();
             this.restartMessages = null;
 
-            // eslint-disable-next-line no-console
             console.log(`[${new Date().toISOString()}] Simulation restarted on ${this.port}`);
         }
     }
 
-    async getOtherPendulums() {
-        const pendulumRequests = this.neighborUrls.map(neighborUrl => got.get(`${neighborUrl}/pendulum`).json().catch(() => null));
+    private async getOtherPendulums(): Promise<PendulumJson[]> {
+        const pendulumRequests = this.neighborUrls
+          .map(neighborUrl => got.get(`${neighborUrl}/pendulum`).json().catch(() => null)) as Promise<PendulumJson | null>[];
         const pendulums = await Promise.all(pendulumRequests);
 
-        return pendulums.filter(p => p);
+        return pendulums.filter(p => p !== null);
     }
 
-    onCollision() {
+    private onCollision(): void {
         this.neighborUrls.forEach(neighborUrl => got.post(`${neighborUrl}/collision`).catch(() => null));
         this.handleCollision();
     }
 
-    getRestartMessages() {
+    private getRestartMessages(): Record<string, false> {
         return this.neighborUrls.reduce((messages, neighborUrl) => {
-            // eslint-disable-next-line no-param-reassign
             messages[neighborUrl] = false;
 
             return messages;
-        }, {});
+        }, {} as Record<string, false>);
     }
 }

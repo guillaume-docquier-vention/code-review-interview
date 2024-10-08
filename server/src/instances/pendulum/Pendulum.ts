@@ -1,8 +1,29 @@
 import { computeAngle, degreesToRadians, getDistance } from "../../utils";
 import { MS_PER_SECONDS } from "../../constants";
+import type { Point } from '../../utils/Point'
+import type { Velocity } from '../../utils/Velocity'
+import type { PendulumJson } from './PendulumJson'
 
 export class Pendulum {
-    constructor(pivotPosition, bobPosition, angle, mass, bobRadius, wind, gravity) {
+    private initialState: {
+        gravity: number;
+        mass: number;
+        angle: number;
+        pivotPosition: Point;
+        bobPosition: Point;
+        bobRadius: number;
+        speed: number;
+        wind: Velocity
+    }
+    private pivotPosition!: Point
+    private bobPosition!: Point
+    private mass!: number
+    private bobRadius!: number
+    private wind!: Velocity
+    private gravity!: number
+    private speed!: number
+
+    public constructor(pivotPosition: Point, bobPosition: Point, angle: number, mass: number, bobRadius: number, wind: Velocity, gravity: number) {
         this.initialState = {
             pivotPosition,
             bobPosition,
@@ -17,7 +38,7 @@ export class Pendulum {
         this.reset();
     }
 
-    get angle() {
+    private get angle(): number {
         // Angle from horizontal line (0, 0) -> (0, 1)
         const dx = this.bobPosition.x - this.pivotPosition.x;
         const dy = this.bobPosition.y - this.pivotPosition.y;
@@ -30,11 +51,11 @@ export class Pendulum {
         return radianAngle;
     }
 
-    get rodLength() {
+    private get rodLength(): number {
         return getDistance(this.pivotPosition, this.bobPosition);
     }
 
-    tick(tickTimeMs) {
+    public tick(tickTimeMs: number): void {
         const { angle, rodLength } = this;
         const tickTimeSeconds = tickTimeMs / MS_PER_SECONDS;
 
@@ -70,7 +91,7 @@ export class Pendulum {
         this.bobPosition.y = this.pivotPosition.y + rodLength * Math.sin(angle + arcAngle);
     }
 
-    reset() {
+    public reset(): void {
         this.pivotPosition = { ...this.initialState.pivotPosition };
         this.bobPosition = { ...this.initialState.bobPosition };
         this.mass = this.initialState.mass;
@@ -80,13 +101,13 @@ export class Pendulum {
         this.speed = this.initialState.speed;
     }
 
-    detectCollision(pendulum) {
+    public detectCollision(pendulum: PendulumJson): boolean {
         const distanceBetweenPendulums = getDistance(pendulum.bobPosition, this.bobPosition);
 
         return distanceBetweenPendulums <= pendulum.bobRadius + this.bobRadius;
     }
 
-    toJson() {
+    public toJson(): PendulumJson {
         return {
             pivotPosition: this.pivotPosition,
             bobPosition: this.bobPosition,

@@ -2,11 +2,9 @@
   "name": "pendulum-server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
-  "type": "module",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "tsx watch src/app.js",
+    "dev": "tsx watch src/app.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,7 +18,9 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/got": "^9.6.12",
     "@types/node": "^20.16.11",
     "eslint": "^8.10.0",
     "eslint-config-airbnb-base": "^15.0.0",
