@@ -1,20 +1,19 @@
 # Vention Take Home Exercise - Server
-This javascript backend uses NodeJS and Express to serve an APIs that expose pendulums states.  
+This Typescript backend uses NodeJS and Express to serve an APIs that expose pendulums states.  
 It simulates nodes being run on different machines with P2P synchronization.  
 This is why they communicate via HTTP rather than sharing state or using IPC.  
 
 ## Development setup
 
-This project uses ESlint, if you are coding in VSCode, install [the extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)  
 In the project directory, run:
 
-### `npm install`
+### `npm ci`
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm run start`
+### `npm run dev`
 
 Runs the app in the development mode.
 5 instances of pendulums will be available at:
